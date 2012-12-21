@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="系统设置">
+	    <EditTextPreference android:title="密码设置" android:summary="点击修改管理员密码" android:key="password"/>
+	    <Preference android:key="RouteSetting" android:summary="设置考试路线" android:title="路线设置"/>
+	    <Preference android:key="ItemSetting" android:summary="设置考试项目" android:title="项目设置"/>
+	    <Preference android:key="ErrSetting" android:summary="设置扣分项目" android:title="扣分设置"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="信号设置">
+        <EditTextPreference android:title="信号1" android:summary="点击设置信号1的名称" android:key="name0"/>
+        <EditTextPreference android:title="信号2" android:summary="点击设置信号2的名称" android:key="name1"/>
+        <EditTextPreference android:title="信号3" android:summary="点击设置信号3的名称" android:key="name2"/>
+        <EditTextPreference android:title="信号4" android:summary="点击设置信号4的名称" android:key="name3"/>
+        <EditTextPreference android:title="信号5" android:summary="点击设置信号5的名称" android:key="name4"/>
+        <EditTextPreference android:title="信号6" android:summary="点击设置信号6的名称" android:key="name5"/>
+        <EditTextPreference android:title="信号7" android:summary="点击设置信号7的名称" android:key="name6"/>
+        <EditTextPreference android:title="信号8" android:summary="点击设置信号8的名称" android:key="name7"/>
+        <EditTextPreference android:title="信号9" android:summary="点击设置信号9的名称" android:key="name8"/>
+        <EditTextPreference android:title="信号10" android:summary="点击设置信号10的名称" android:key="name9"/>
+        <EditTextPreference android:title="信号11" android:summary="点击设置信号11的名称" android:key="name10"/>
+        <EditTextPreference android:title="信号12" android:summary="点击设置信号12的名称" android:key="name11"/>
+        <EditTextPreference android:title="信号13" android:summary="点击设置信号13的名称" android:key="name12"/>
+        <EditTextPreference android:title="信号14" android:summary="点击设置信号14的名称" android:key="name13"/>
+        <EditTextPreference android:title="信号15" android:summary="点击设置信号15的名称" android:key="name14"/>
+        <EditTextPreference android:title="信号16" android:summary="点击设置信号16的名称" android:key="name15"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="脉冲设置">
+        <EditTextPreference android:title="脉冲1" android:summary="点击设置脉冲1的名称" android:key="name20"/>
+        <EditTextPreference android:title="脉冲2" android:summary="点击设置脉冲2的名称" android:key="name21"/>
+        <EditTextPreference android:title="脉冲1修正系数" android:summary="点击设置脉冲1修正系数" android:key="maichongxs1"/>
+        <EditTextPreference android:title="脉冲2修正系数" android:summary="点击设置脉冲2修正系数" android:key="maichongxs2"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="GPS设置">
+        <EditTextPreference android:title="阈值：0" android:key="range" android:summary="设置路线中自动触发考试项目的范围（单位：米）" android:dialogTitle="阈值"/>
+        <CheckBoxPreference android:title="GPS速度单位为海里" android:summary="默认为公里，勾选此项将单位设置为海里" android:key="haili" android:defaultValue="false"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="串口设置">    
+		<ListPreference android:key="device" android:title="串口" android:persistent="true"></ListPreference>
+		<ListPreference android:entries="@array/baudrates_name" android:entryValues="@array/baudrates_value" android:key="baudrate" android:persistent="true" android:title="波特率"></ListPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
