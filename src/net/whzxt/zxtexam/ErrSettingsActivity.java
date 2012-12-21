@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import android.app.Activity;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,17 +16,15 @@ import android.widget.SimpleAdapter;
 public class ErrSettingsActivity extends Activity {
 
 	private ListView listView;
-	private DBer sqlHelper;
-	private SQLiteDatabase db;
+	private Metadata md;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_errsettings);
 		listView = (ListView) findViewById(R.id.listView1);
-		sqlHelper = new DBer(this, Metadata.DBNAME, null, Metadata.DBVERSION);
-		db = sqlHelper.getWritableDatabase();
-		Cursor cursor = db.rawQuery("select a.errid,a.name,a.fenshu,b.name as itemname from " + DBer.T_ITEM_ERR + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid", null);
+		md = (Metadata)getApplication();
+		Cursor cursor = md.rawQuery("select a.errid,a.name,a.fenshu,b.name as itemname from " + DBer.T_ITEM_ERR + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid");
 		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
 		if (cursor.moveToFirst()) {
 			do {

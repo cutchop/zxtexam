@@ -246,37 +246,57 @@ public class DetectActivity extends SerialPortActivity {
 
 	@Override
 	protected void onDataReceived(byte[] buffer, int size) {
-		// data = new String(buffer, 0, size);
 		data = "";
-		for (int i = 0; i < buffer.length; i++) {
-			data += Integer.toHexString(buffer[i])+" ";
+		for (int i = 0; i < size; i++) {
+			if (Integer.toHexString(buffer[i]).length() == 1) {
+				data += "0"+Integer.toHexString(buffer[i])+" ";
+			} else {
+				data += Integer.toHexString(buffer[i])+" ";
+			}
 		}
 		data = data.toUpperCase();
-		if (buffer.length == 17) {
-			if (buffer[0] == 0x1A && buffer[1] == 0x02) {
-				String str = Integer.toBinaryString(buffer[2]);
+		handler.sendEmptyMessage(2);
+		if (buffer[0] == 0x1A && buffer[size-1] == 0x1D) {
+			String bfs = data;
+			bfs = bfs.replace(" ", "").replace("1B11", "1A").replace("1B14", "1D").replace("1B0B", "1B");
+			int t1 = 0;
+			int t2 = 0;
+			for (int i = 2; i < 20; i++) {
+				t1 += Integer.parseInt(bfs.substring(i,i+2),16);
+				i++;
+			}
+			for (int i = 24; i < 32; i++) {
+				t2 += Integer.parseInt(bfs.substring(i,i+2),16);
+				i++;
+			}
+			if (t1 != t2) {
+				return;
+			}
+			if (bfs.substring(2, 4).equals("02")) {				
+				String str = md.toBinaryString(Integer.parseInt(bfs.substring(4,6),16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
-						md.setData(i, 1);
+						md.setData(7-i, 1);
 					} else {
-						md.setData(i, 0);
+						md.setData(7-i, 0);
 					}
 				}
-				str = Integer.toBinaryString(buffer[3]);
+				str = md.toBinaryString(Integer.parseInt(bfs.substring(6,8),16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
-						md.setData(i + 8, 1);
+						md.setData(15-i, 1);
 					} else {
-						md.setData(i + 8, 0);
+						md.setData(15-i, 0);
 					}
 				}
+				md.setData(20, Integer.parseInt(bfs.substring(10,12)+bfs.substring(8,10),16));				
+				md.setData(21, Integer.parseInt(bfs.substring(18,20)+bfs.substring(16,18),16));
 				handler.sendEmptyMessage(0);
 			}
 		}
-		handler.sendEmptyMessage(2);
 	}
-
+	
 	private void appendText() {
-		txtReception.append(data);
+		txtReception.setText(data);
 	}
 }

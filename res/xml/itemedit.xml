@@ -4,6 +4,23 @@
     <EditTextPreference android:title="语音提示" android:key="ie_tts"/>
     <EditTextPreference android:title="时长" android:key="ie_timeout"/>
     <PreferenceCategory android:title="要求的条件" android:key="ie_actions">
+        <CheckBoxPreference android:key="ie_action_20" android:title="速度"/>
+        <EditTextPreference android:title="最小值" android:key="ie_action_20_min" android:dependency="ie_action_20"/>
+        <EditTextPreference android:title="最大值" android:key="ie_action_20_max" android:dependency="ie_action_20"/>
+        <ListPreference android:title="扣分项" android:key="ie_action_20_err" android:dependency="ie_action_20"/>
+        <CheckBoxPreference android:key="ie_action_21" android:title="转速"/>
+        <EditTextPreference android:title="最小值" android:key="ie_action_21_min" android:dependency="ie_action_21"/>
+        <EditTextPreference android:title="最大值" android:key="ie_action_21_max" android:dependency="ie_action_21"/>
+        <ListPreference android:title="扣分项" android:key="ie_action_21_err" android:dependency="ie_action_21"/>
+        <CheckBoxPreference android:key="ie_action_30" android:title="GPS速度"/>
+        <EditTextPreference android:title="最小值" android:key="ie_action_30_min" android:dependency="ie_action_30"/>
+        <EditTextPreference android:title="最大值" android:key="ie_action_30_max" android:dependency="ie_action_30"/>
+        <ListPreference android:title="扣分项" android:key="ie_action_30_err" android:dependency="ie_action_30"/>
+        <CheckBoxPreference android:key="ie_action_31" android:title="GPS角度偏差"/>
+        <EditTextPreference android:title="最小值" android:key="ie_action_31_min" android:dependency="ie_action_31"/>
+        <EditTextPreference android:title="最大值" android:key="ie_action_31_max" android:dependency="ie_action_31"/>
+        <ListPreference android:title="扣分项" android:key="ie_action_31_err" android:dependency="ie_action_31"/>
+        
         <CheckBoxPreference android:title="信号1" android:key="ie_action_0"/>
         <ListPreference android:title="次数" android:key="ie_action_0_times" android:dependency="ie_action_0"/>
         <ListPreference android:title="扣分项" android:key="ie_action_0_err" android:dependency="ie_action_0"/>
@@ -52,53 +69,5 @@
         <CheckBoxPreference android:title="信号16" android:key="ie_action_15"/>
         <ListPreference android:title="次数" android:key="ie_action_15_times" android:dependency="ie_action_15"/>
         <ListPreference android:title="扣分项" android:key="ie_action_15_err" android:dependency="ie_action_15"/>
-        <EditTextPreference android:key="ie_action_20_min" android:title="脉冲1必须大于"/>
-        <EditTextPreference android:key="ie_action_20_max" android:title="脉冲1必须小于"/>
-        <EditTextPreference android:key="ie_action_21_min" android:title="脉冲2必须大于"/>
-        <EditTextPreference android:key="ie_action_21_max" android:title="脉冲2必须小于"/>
-        <EditTextPreference android:key="ie_action_30_min" android:title="GPS速度必须大于"/>
-        <EditTextPreference android:key="ie_action_30_max" android:title="GPS速度必须小于"/>
-        <EditTextPreference android:key="ie_action_31_range" android:title="GPS角度偏差"/>
-    </PreferenceCategory>
-    <PreferenceCategory android:key="ie_notallows" android:title="禁止的条件">
-        <CheckBoxPreference android:title="信号1" android:key="ie_notallow_0"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_0_err" android:dependency="ie_notallow_0"/>
-        <CheckBoxPreference android:title="信号2" android:key="ie_notallow_1"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_1_err" android:dependency="ie_notallow_1"/>
-        <CheckBoxPreference android:title="信号3" android:key="ie_notallow_2"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_2_err" android:dependency="ie_notallow_2"/>
-        <CheckBoxPreference android:title="信号4" android:key="ie_notallow_3"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_3_err" android:dependency="ie_notallow_3"/>
-        <CheckBoxPreference android:title="信号5" android:key="ie_notallow_4"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_4_err" android:dependency="ie_notallow_4"/>
-        <CheckBoxPreference android:title="信号6" android:key="ie_notallow_5"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_5_err" android:dependency="ie_notallow_5"/>
-        <CheckBoxPreference android:title="信号7" android:key="ie_notallow_6"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_6_err" android:dependency="ie_notallow_6"/>
-        <CheckBoxPreference android:title="信号8" android:key="ie_notallow_7"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_7_err" android:dependency="ie_notallow_7"/>
-        <CheckBoxPreference android:title="信号9" android:key="ie_notallow_8"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_8_err" android:dependency="ie_notallow_8"/>
-        <CheckBoxPreference android:title="信号10" android:key="ie_notallow_9"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_9_err" android:dependency="ie_notallow_9"/>
-        <CheckBoxPreference android:title="信号11" android:key="ie_notallow_10"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_10_err" android:dependency="ie_notallow_10"/>
-        <CheckBoxPreference android:title="信号12" android:key="ie_notallow_11"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_11_err" android:dependency="ie_notallow_11"/>
-        <CheckBoxPreference android:title="信号13" android:key="ie_notallow_12"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_12_err" android:dependency="ie_notallow_12"/>
-        <CheckBoxPreference android:title="信号14" android:key="ie_notallow_13"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_13_err" android:dependency="ie_notallow_13"/>
-        <CheckBoxPreference android:title="信号15" android:key="ie_notallow_14"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_14_err" android:dependency="ie_notallow_14"/>
-        <CheckBoxPreference android:title="信号16" android:key="ie_notallow_15"/>
-        <ListPreference android:title="扣分项" android:key="ie_notallow_15_err" android:dependency="ie_notallow_15"/>
-        <EditTextPreference android:key="ie_notallow_20_min" android:title="脉冲1不能大于"/>
-        <EditTextPreference android:key="ie_notallow_20_max" android:title="脉冲1不能小于"/>
-        <EditTextPreference android:key="ie_notallow_21_min" android:title="脉冲2不能大于"/>
-        <EditTextPreference android:key="ie_notallow_21_max" android:title="脉冲2不能小于"/>
-        <EditTextPreference android:key="ie_notallow_30_min" android:title="GPS速度不能大于"/>
-        <EditTextPreference android:key="ie_notallow_30_max" android:title="GPS速度不能小于"/>
-        <EditTextPreference android:key="ie_notallow_31_range" android:title="GPS角度偏差"/>
     </PreferenceCategory>
 </PreferenceScreen>

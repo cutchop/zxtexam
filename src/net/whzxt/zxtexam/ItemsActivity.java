@@ -2,7 +2,6 @@ package net.whzxt.zxtexam;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -11,19 +10,16 @@ import android.preference.PreferenceCategory;
 
 public class ItemsActivity extends PreferenceActivity implements OnPreferenceClickListener {
 
-	private DBer sqlHelper;
-	private SQLiteDatabase db;
 	private PreferenceCategory itemcategory;
+	private Metadata md;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.itemsettings);
 		itemcategory = (PreferenceCategory) findPreference("itemcategory");
-
-		sqlHelper = new DBer(this, Metadata.DBNAME, null, Metadata.DBVERSION);
-		db = sqlHelper.getWritableDatabase();
-		Cursor cursor = db.rawQuery("select * from " + DBer.T_ITEM + " order by itemid", null);
+		md = (Metadata)getApplication();
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by itemid");
 		if (cursor.moveToFirst()) {
 			do {
 				Preference preference = new Preference(this);

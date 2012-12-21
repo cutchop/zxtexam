@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 
-import android.R.string;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
 
@@ -23,8 +25,8 @@ public class Metadata extends Application {
 	private float lon = 0f;
 	private SharedPreferences settings;
 	private static final String[] DEF_XINHAO_NAME = { "信号1", "信号2", "信号3", "信号4", "信号5", "信号6", "信号7", "信号8", "信号9", "信号10", "信号11", "信号12", "信号13", "信号14", "信号15", "信号16" };
-	private static final String[] DEF_MAICHONG_NAME = { "速度", "脉冲2" };
-	private static final float[] DEF_MAICHONG_XS = { 0.75f, 0.75f };// 脉冲修正系数
+	private static final String[] DEF_MAICHONG_NAME = { "速度", "转速" };
+	private static final float[] DEF_MAICHONG_XS = { 0.75f, 1f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
 	private static final int DEF_RANGE = 30;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
@@ -32,8 +34,10 @@ public class Metadata extends Application {
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	public static final int DBVERSION = 2;
-	public static final String DBNAME = "zxtexam.db";
+	private static final int DBVERSION = 3;
+	private static final String DBNAME = "zxtexam.db";
+	private DBer sqlHelper;
+	private SQLiteDatabase db;
 	
 	public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 	private SerialPort mSerialPort = null;
@@ -63,6 +67,18 @@ public class Metadata extends Application {
 
 		data_Maichong.put(20, 0);
 		data_Maichong.put(21, 0);
+
+		sqlHelper = new DBer(this, Metadata.DBNAME, null, Metadata.DBVERSION);
+		db = sqlHelper.getWritableDatabase();
+	}
+	
+	public Cursor rawQuery(String sql){
+		Log.i("database", sql);
+		return db.rawQuery(sql, null);
+	}
+	public void execSQL(String sql){
+		Log.i("database", sql);
+		db.execSQL(sql);
 	}
 
 	public void setData(int id, int val) {
@@ -175,5 +191,18 @@ public class Metadata extends Application {
 			mSerialPort = null;
 		}
 	}
+	
+	public String toBinaryString(int i) {
+		char[] digits = {'0','1'};
+        char[] buf = new char[8];
+        int pos = 8;
+        int mask = 1;
+        do {
+            buf[--pos] = digits[i & mask];
+            i >>>= 1;
+        } while (pos > 0);
+         
+        return new String(buf, pos, 8);
+    }
 
 }

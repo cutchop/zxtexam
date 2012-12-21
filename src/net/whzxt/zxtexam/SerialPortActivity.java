@@ -28,10 +28,10 @@ public abstract class SerialPortActivity extends Activity {
 			while(!isInterrupted()) {
 				int size;
 				try {
-					byte[] buffer = new byte[17];
+					byte[] buffer = new byte[32];
 					if (mInputStream == null) return;
 					size = mInputStream.read(buffer);
-					if (size > 0) {
+					if (size >= 17) {
 						onDataReceived(buffer, size);
 					}
 				} catch (IOException e) {

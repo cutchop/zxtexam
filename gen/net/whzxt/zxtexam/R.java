@@ -42,23 +42,27 @@ public final class R {
     }
     public static final class drawable {
         public static final int button_checked_bg=0x7f020000;
-        public static final int ic_action_search=0x7f020001;
-        public static final int ic_launcher=0x7f020002;
+        public static final int del=0x7f020001;
+        public static final int ic_action_search=0x7f020002;
+        public static final int ic_launcher=0x7f020003;
     }
     public static final class id {
+        public static final int btnName=0x7f0a0029;
+        public static final int btnTts=0x7f0a002b;
         public static final int layDetect=0x7f0a0027;
         public static final int layItem0=0x7f0a0020;
         public static final int layItem0_s=0x7f0a0023;
         public static final int layItem1=0x7f0a001b;
-        public static final int layItem1_d=0x7f0a0028;
         public static final int layItem1_s=0x7f0a0021;
         public static final int layItem2=0x7f0a001c;
         public static final int layItem3=0x7f0a001d;
         public static final int layItem4=0x7f0a001e;
         public static final int layItem5=0x7f0a001f;
+        public static final int layItems=0x7f0a002d;
         public static final int layStart=0x7f0a0025;
         public static final int laySystem=0x7f0a0026;
         public static final int listView1=0x7f0a0000;
+        public static final int scrollView1=0x7f0a002c;
         public static final int tableRow1=0x7f0a0001;
         public static final int tableRow2=0x7f0a0006;
         public static final int tableRow3=0x7f0a000b;
@@ -72,7 +76,6 @@ public final class R {
         public static final int textView13=0x7f0a0012;
         public static final int textView14=0x7f0a0013;
         public static final int textView15=0x7f0a0014;
-        public static final int textView1_d=0x7f0a0029;
         public static final int textView1_s=0x7f0a0022;
         public static final int textView2=0x7f0a0004;
         public static final int textView20=0x7f0a0015;
@@ -87,7 +90,9 @@ public final class R {
         public static final int textView7=0x7f0a000a;
         public static final int textView8=0x7f0a000c;
         public static final int textView9=0x7f0a000d;
+        public static final int txtName=0x7f0a0028;
         public static final int txtReception=0x7f0a001a;
+        public static final int txtTts=0x7f0a002a;
     }
     public static final class layout {
         public static final int activity_choose=0x7f030000;
