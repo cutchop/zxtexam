@@ -19,7 +19,7 @@ public class DBer extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ROUTE + " (routeid INTEGER PRIMARY KEY,name VARCHAR(20),tts VARCHAR(100))");
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ROUTE_ITEM + " (routeid INTEGER,itemid INTEGER)");
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ROUTE_ITEM + " (routeid INTEGER,itemid INTEGER,lon FLOAT,lat FLOAT)");
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM + " (itemid INTEGER PRIMARY KEY,name VARCHAR(20),tts VARCHAR(100),timeout INTEGER)");
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM_ERR + " (errid INTEGER PRIMARY KEY,itemid INTEGER,name VARCHAR(100),fenshu INTEGER)");
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM_ACTION + " (itemid INTEGER,dataid INTEGER,times INTEGER,min INTEGER,max INTEGER,errid INTEGER)");
@@ -101,6 +101,13 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (46,10, '在路口转弯时，使用远光灯', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (47,10, '超车时未变换使用远、近光灯提醒被超越车辆', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (48,10, '在有路灯、照明良好的道路上行驶时，使用远光灯', 100)");
+
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (49,11, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (50,12, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (51,13, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (52,14, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (53,15, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (54,16, '不能正确开启灯光', 100)");
 		// 路线
 		db.execSQL("INSERT INTO " + T_ROUTE + " (routeid, name, tts) VALUES (0, '随机路线', '当前为随机路线')");
 		db.execSQL("INSERT INTO " + T_ROUTE + " (routeid, name, tts) VALUES (1, '灯光', '下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作')");

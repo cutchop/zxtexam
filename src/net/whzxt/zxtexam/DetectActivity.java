@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -131,19 +132,11 @@ public class DetectActivity extends SerialPortActivity {
 					readFlag = !readFlag;
 				}
 			}
-		}, 1000, 1000);
+		}, 50, 50);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				1000, 0, locationListener);
 		changeGPS();
-		/*
-		byte[] bs = new byte[17];
-		bs[0] = 0x1A;
-		bs[1] = 0x02;
-		bs[2] = 0x55;
-		bs[3] = 0x56;
-		onDataReceived(bs, 17);
-		*/
 	}
 
 	private void writeSerial() {
@@ -248,10 +241,10 @@ public class DetectActivity extends SerialPortActivity {
 	protected void onDataReceived(byte[] buffer, int size) {
 		data = "";
 		for (int i = 0; i < size; i++) {
-			if (Integer.toHexString(buffer[i]).length() == 1) {
-				data += "0"+Integer.toHexString(buffer[i])+" ";
+			if (Integer.toHexString(buffer[i]&0xFF).length() == 1) {
+				data += "0"+Integer.toHexString(buffer[i]&0xFF)+" ";
 			} else {
-				data += Integer.toHexString(buffer[i])+" ";
+				data += Integer.toHexString(buffer[i]&0xFF)+" ";
 			}
 		}
 		data = data.toUpperCase();
@@ -298,5 +291,15 @@ public class DetectActivity extends SerialPortActivity {
 	
 	private void appendText() {
 		txtReception.setText(data);
+	}
+	
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			_timer.cancel();
+			DetectActivity.this.finish();
+		}
+		return false;
 	}
 }

@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
         layDetect = (LinearLayout)findViewById(R.id.layDetect);
         layStart.setOnClickListener(new OnClickListener() {			
 			public void onClick(View v) {
-				//startActivity(new Intent().setClass(MainActivity.this, ChooseActivity.class));
+				startActivity(new Intent().setClass(MainActivity.this, ChooseActivity.class));
 			}
 		});
         laySystem.setOnClickListener(new OnClickListener() {

@@ -1,24 +1,43 @@
 package net.whzxt.zxtexam;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class RouteEditActivity extends Activity {
 
 	private EditText txtName, txtTts;
 	private Button btnName, btnTts;
-	private LinearLayout layItems;
+	private ListView listView;
 	private Metadata md;
 	private int routeid;
+	private List<String> data;
+	private Map<String, Integer> map;
+	private Map<Integer, Integer> mapItems;
+	private String[] strItems;
+	private LocationManager locationManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +48,7 @@ public class RouteEditActivity extends Activity {
 		txtTts = (EditText) findViewById(R.id.txtTts);
 		btnName = (Button) findViewById(R.id.btnName);
 		btnTts = (Button) findViewById(R.id.btnTts);
-		layItems = (LinearLayout) findViewById(R.id.layItems);
+		listView = (ListView) findViewById(R.id.listView1);
 
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
@@ -45,8 +64,9 @@ public class RouteEditActivity extends Activity {
 			txtName.setEnabled(true);
 			btnName.setText("保存");
 		}
-		TextView textView = new TextView(this);
-		textView.setTextAppearance(RouteEditActivity.this, android.R.attr.textAppearanceMedium);
+
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
 
 		btnName.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -100,7 +120,116 @@ public class RouteEditActivity extends Activity {
 				}
 			}
 		});
+
+		data = new ArrayList<String>();
+		map = new HashMap<String, Integer>();
+		mapItems = new HashMap<Integer, Integer>();
+
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM);
+		if (cursor.moveToFirst()) {
+			strItems = new String[cursor.getCount()];
+			int i = 0;
+			do {
+				strItems[i] = cursor.getString(cursor.getColumnIndex("name"));
+				mapItems.put(i, cursor.getInt(cursor.getColumnIndex("itemid")));
+				i++;
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				final String itemname = data.get(arg2);
+				if (map.get(itemname) == null) {
+					if (routeid == -1) {
+						Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
+					} else {
+						AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
+								.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {
+										return;
+									}
+								}).create();
+						alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+							public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+								if (keyCode == KeyEvent.KEYCODE_HOME)
+									return true;
+								return false;
+							}
+						});
+						alertDialog.show();
+						alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+					}
+				} else {
+					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要删除该项目？").setIcon(android.R.drawable.ic_menu_help)
+							.setPositiveButton("是", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+									load();
+								}
+							}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									return;
+								}
+							}).create();
+					alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+							if (keyCode == KeyEvent.KEYCODE_HOME)
+								return true;
+							return false;
+						}
+					});
+					alertDialog.show();
+					alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+				}
+			}
+		});
+		load();
 	}
+
+	private void load() {
+		data.clear();
+		map.clear();
+		Cursor cursor = md.rawQuery("select a.itemid,b.name from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid);
+		if (cursor.moveToFirst()) {
+			do {
+				data.add(cursor.getString(cursor.getColumnIndex("name")));
+				map.put(cursor.getString(cursor.getColumnIndex("name")), cursor.getInt(cursor.getColumnIndex("itemid")));
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+		data.add("添加项目...");
+		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
+	}
+
+	private DialogInterface.OnClickListener onselect = new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			float[] latlon = md.getLatlon();
+			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat) values(" + routeid + "," + mapItems.get(which) + "," + latlon[1] + "," + latlon[0] + ")");
+			load();
+		}
+	};
+
+	private final LocationListener locationListener = new LocationListener() {
+		public void onLocationChanged(Location location) {
+			if (location != null) {
+				md.setGPSSpeed(location.getSpeed());
+				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
+				md.setData(31, Math.round(location.getBearing()));
+			}
+		}
+
+		public void onProviderDisabled(String provider) {
+			// Provider被disable时触发此函数，比如GPS被关闭
+		}
+
+		public void onProviderEnabled(String provider) {
+			// Provider被enable时触发此函数，比如GPS被打开
+		}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// Provider的转态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
+		}
+	};
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

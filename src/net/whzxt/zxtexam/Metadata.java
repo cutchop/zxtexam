@@ -34,11 +34,11 @@ public class Metadata extends Application {
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 3;
+	private static final int DBVERSION = 5;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
-	
+
 	public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 	private SerialPort mSerialPort = null;
 
@@ -71,12 +71,13 @@ public class Metadata extends Application {
 		sqlHelper = new DBer(this, Metadata.DBNAME, null, Metadata.DBVERSION);
 		db = sqlHelper.getWritableDatabase();
 	}
-	
-	public Cursor rawQuery(String sql){
+
+	public Cursor rawQuery(String sql) {
 		Log.i("database", sql);
 		return db.rawQuery(sql, null);
 	}
-	public void execSQL(String sql){
+
+	public void execSQL(String sql) {
 		Log.i("database", sql);
 		db.execSQL(sql);
 	}
@@ -113,6 +114,10 @@ public class Metadata extends Application {
 		this.lon = lon;
 	}
 
+	public float[] getLatlon() {
+		return new float[] { lat, lon };
+	}
+
 	public String getLatLonString() {
 		return String.format("%.6f", lon) + "," + String.format("%.6f", lat);
 	}
@@ -133,7 +138,7 @@ public class Metadata extends Application {
 		return 0;
 	}
 
-	public int getRange() {		
+	public int getRange() {
 		return Integer.parseInt(settings.getString("range", String.valueOf(DEF_RANGE)));
 	}
 
@@ -166,7 +171,6 @@ public class Metadata extends Application {
 		}
 		return ret;
 	}
-	
 
 	public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {
 		if (mSerialPort == null) {
@@ -175,7 +179,7 @@ public class Metadata extends Application {
 			int baudrate = Integer.decode(settings.getString("baudrate", DEF_BAUDRATE));
 
 			/* Check parameters */
-			if ( (path.length() == 0) || (baudrate == -1)) {
+			if ((path.length() == 0) || (baudrate == -1)) {
 				throw new InvalidParameterException();
 			}
 
@@ -191,18 +195,18 @@ public class Metadata extends Application {
 			mSerialPort = null;
 		}
 	}
-	
+
 	public String toBinaryString(int i) {
-		char[] digits = {'0','1'};
-        char[] buf = new char[8];
-        int pos = 8;
-        int mask = 1;
-        do {
-            buf[--pos] = digits[i & mask];
-            i >>>= 1;
-        } while (pos > 0);
-         
-        return new String(buf, pos, 8);
-    }
+		char[] digits = { '0', '1' };
+		char[] buf = new char[8];
+		int pos = 8;
+		int mask = 1;
+		do {
+			buf[--pos] = digits[i & mask];
+			i >>>= 1;
+		} while (pos > 0);
+
+		return new String(buf, pos, 8);
+	}
 
 }
