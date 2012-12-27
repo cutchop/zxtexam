@@ -38,6 +38,7 @@ public class RouteEditActivity extends Activity {
 	private Map<Integer, Integer> mapItems;
 	private String[] strItems;
 	private LocationManager locationManager;
+	private Boolean bdjwd = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -143,21 +144,50 @@ public class RouteEditActivity extends Activity {
 					if (routeid == -1) {
 						Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
 					} else {
-						AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
-								.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										return;
-									}
-								}).create();
-						alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-							public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-								if (keyCode == KeyEvent.KEYCODE_HOME)
-									return true;
-								return false;
-							}
-						});
-						alertDialog.show();
-						alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+						bdjwd = true;
+						if (md.getLatlon()[0] != 0) {
+							String[] strs = { "绑定当前位置:" + md.getLatLonString(), "不绑定位置信息" };
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help)
+									.setItems(strs, new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											if (which == 1) {
+												bdjwd = false;
+											}
+											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
+													.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+														public void onClick(DialogInterface dialog, int which) {
+															return;
+														}
+													}).create();
+											dialog2.show();
+										}
+									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+							alertDialog.show();
+						} else {
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help)
+									.setPositiveButton("继续", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											bdjwd = false;
+											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
+													.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+														public void onClick(DialogInterface dialog, int which) {
+															return;
+														}
+													}).create();
+											dialog2.show();
+										}
+									})
+									.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+							alertDialog.show();
+						}
 					}
 				} else {
 					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要删除该项目？").setIcon(android.R.drawable.ic_menu_help)
@@ -204,6 +234,10 @@ public class RouteEditActivity extends Activity {
 	private DialogInterface.OnClickListener onselect = new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int which) {
 			float[] latlon = md.getLatlon();
+			if (!bdjwd) {
+				latlon[0] = 0;
+				latlon[1] = 0;
+			}
 			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat) values(" + routeid + "," + mapItems.get(which) + "," + latlon[1] + "," + latlon[0] + ")");
 			load();
 		}

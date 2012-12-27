@@ -24,6 +24,7 @@
         <activity android:name=".ItemEditActivity"></activity>
         <activity android:name=".SystemActivity"></activity>
         <activity android:name=".ItemsActivity"></activity>
+        <activity android:name=".ItemStepActivity"></activity>
         <activity android:name=".ErrSettingsActivity"></activity>
         <activity android:name=".DetectActivity"></activity>
     </application>
