@@ -23,9 +23,10 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 	private String[] errnames;
 	private String[] errvalues;
 	private HashMap<String, String> errmap;
-	private String[] timesnames = { "0次", "1次", "2次", "3次", "一直" };
-	private String[] timesvalues = { "0", "1", "2", "3", "9" };
+	private String[] timesnames = { "信号等于1就扣分", "信号等于0就扣分", "信号等于1就通过", "信号等于0就通过", "信号等于1并且保持1秒以上就通过", "信号等于0并且保持1秒以上就通过", "信号等于1并且保持3秒以上就通过", "信号等于0并且保持3秒以上就通过" };
+	private String[] timesvalues = { "1", "-1", "2", "-2", "3", "-3", "4", "-4" };
 	private HashMap<String, String> timesmap;
+	private int step;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		Bundle bundle = this.getIntent().getExtras();
 		int id = bundle.getInt("itemid");
 		itemid = id;
+		step = bundle.getInt("step");
 
 		Preference preference = null;
 		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " where itemid=" + id);
@@ -198,7 +200,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			} else {
 				String id = key.replace("ie_action_", "");
 				if ((Boolean) arg1) {
-					md.execSQL("INSERT INTO " + DBer.T_ITEM_ACTION + " (itemid, dataid, times, min, max, errid) VALUES (" + itemid + "," + id + ",0,0,0,999)");
+					md.execSQL("INSERT INTO " + DBer.T_ITEM_ACTION + " (itemid, dataid, times, min, max, errid, step) VALUES (" + itemid + "," + id + ",0,0,0,999," + step + ")");
 				} else {
 					md.execSQL("delete from " + DBer.T_ITEM_ACTION + " where itemid=" + itemid + " and dataid=" + id);
 					findPreference(key + "_err").setSummary("");
@@ -253,6 +255,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			editor.remove("ie_action_30_err");
 			editor.remove("ie_action_31_err");
 			editor.commit();
+			setResult(RESULT_OK);
 			this.finish();
 		}
 		return false;

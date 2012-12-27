@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ExamListAdapter extends ArrayAdapter<HashMap<String, Object>> {
+public class ExamListAdapter extends ArrayAdapter<HashMap<String, String>> {
 
-	public ExamListAdapter(Context context, List<HashMap<String, Object>> objects) {
+	public ExamListAdapter(Context context, List<HashMap<String, String>> objects) {
 		super(context, 0, objects);
 	}
 

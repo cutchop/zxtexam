@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.w3c.dom.ls.LSException;
-
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,13 +16,13 @@ import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -43,7 +41,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private String routeTts;
 	private ListView listView;
 	private GridView gridView;
-	private ArrayList<HashMap<String, Object>> errList;
+	private CheckBox cbAuto;
+	private ArrayList<HashMap<String, String>> errList;
 	private ArrayList<HashMap<String, Object>> itemList;
 	private Metadata md;
 	private int fenshu;
@@ -51,25 +50,17 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Date start;
 	private TextView txtRouteName, txtTime, txtDefen;
 	private Button btnRgpp, btnStop;
-	private ArrayList<Action> listActions;
-	private int _timeout = 0;
-	private HashMap<Integer, Integer> hashdata;
-	private int startAngle = 0;
 	private TextToSpeech mTts;
 	private static final int REQ_TTS_STATUS_CHECK = 0;
 	private LocationManager locationManager;
-	private Boolean execing = false;
 	private byte[] mBuffer;
-	private int currId = -1;
+	private int currId = 0;
+	private ItemManager itemManager;
 
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			if (msg.what >= 0) {
-				addListItem(msg.what);
-			} else {
-				txtTime.setText("用时：" + getTimeDiff(start, new Date()));
-			}
+			txtTime.setText("用时：" + getTimeDiff(start, new Date()));
 		}
 	};
 
@@ -79,7 +70,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			mTts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 				public void onUtteranceCompleted(final String utteranceId) {
 					if (utteranceId != null) {
-						if (Integer.parseInt(utteranceId) > -1) {
+						if (Integer.parseInt(utteranceId) == currId) {
 							runOnUiThread(new Runnable() {
 								public void run() {
 									try {
@@ -131,16 +122,47 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		gridView = (GridView) findViewById(R.id.gridView1);
 		btnRgpp = (Button) findViewById(R.id.btnRgpp);
 		btnStop = (Button) findViewById(R.id.btnStop);
+		cbAuto = (CheckBox) findViewById(R.id.cbAuto);
 		md = (Metadata) getApplication();
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
 		txtRouteName.setText("考试项目列表：(" + bundle.getString("routename") + ")");
 		fenshu = 100;
-		listActions = new ArrayList<Action>();
-		errList = new ArrayList<HashMap<String, Object>>();
+		errList = new ArrayList<HashMap<String, String>>();
 		itemList = new ArrayList<HashMap<String, Object>>();
-		hashdata = new HashMap<Integer, Integer>();
-		resetdata();
+		itemManager = new ItemManager(new ItemManager.OnStatusChange() {
+			public void onStop() {
+				if (routeid == 1 && cbAuto.isChecked() && currId < itemList.size() - 1) {
+					currId++;
+					speak(itemList.get(currId).get("tts").toString(), currId);
+				} else {
+					if (fenshu < 90) {
+						speak("考试不合格,您的扣分项目为," + errList.get(errList.size() - 1).get("errname"));
+					} else {
+						speak("完成");
+					}
+				}
+			}
+
+			// 扣分
+			public void onFault(Action action) {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("itemname", action.Itemname);
+				map.put("fenshu", String.valueOf(action.Fenshu));
+				map.put("errname", action.Err);
+				errList.add(map);
+				fenshu -= action.Fenshu;
+				if (fenshu < 0) {
+					fenshu = 0;
+				}
+				runOnUiThread(new Runnable() {					
+					public void run() {
+						listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList));
+						txtDefen.setText(String.valueOf(fenshu));	
+					}
+				});
+			}
+		}, md);
 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
@@ -156,8 +178,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		startActivityForResult(checkIntent, REQ_TTS_STATUS_CHECK);
 
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,b.name as itemname,b.tts,b.timeout from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid="
-				+ routeid);
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,b.name as itemname,b.tts,b.timeout from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid);
 		if (cursor.moveToFirst()) {
 			HashMap<String, Object> map = null;
 			do {
@@ -175,12 +196,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				if (execing) {
-					Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
-				} else {
+				if (itemManager._pause) {
+					currId = arg2;
 					@SuppressWarnings("unchecked")
 					HashMap<String, Object> map = (HashMap<String, Object>) gridView.getItemAtPosition(arg2);
 					speak(map.get("tts").toString(), arg2);
+				} else {
+					Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -188,16 +210,15 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		// 扣分
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help)
-						.setPositiveButton("是", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								delListItem(arg2);
-							}
-						}).setNegativeButton("否", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								return;
-							}
-						}).create();
+				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						delListItem(arg2);
+					}
+				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
 				alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
 					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
 						if (keyCode == KeyEvent.KEYCODE_HOME)
@@ -246,153 +267,45 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					e.printStackTrace();
 				}
 			}
-		}, 50, 50);
+		}, 1000, 50);
 
+		// 计时
 		_timer = new Timer();
 		_timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				handler.sendEmptyMessage(-1);
-				if (_timeout > 0) {
-					_timeout--;
-					if (_timeout == 0) {
-						for (int i = 0; i < listActions.size(); i++) {
-							if (listActions.get(i).getDataid() < 20) {
-								if (hashdata.get(listActions.get(i).getDataid()) < listActions.get(i).getTimes()) {
-									handler.sendEmptyMessage(i);
-								}
-							} else if (listActions.get(i).getDataid() == 31) {
-								if (listActions.get(i).getMin() > 0) {
-									if (hashdata.get(31) < listActions.get(i).getMin()) {
-										handler.sendEmptyMessage(i);
-									}
-								}
-							}
-						}
-						execing = false;
-					} else {
-						for (int i = 0; i < listActions.size(); i++) {
-							if (listActions.get(i).getDataid() < 20) {
-								if (listActions.get(i).getTimes() == 0) {
-									if (md.getData(listActions.get(i).getDataid()) == 1) {
-										handler.sendEmptyMessage(i);
-									}
-								} else if (listActions.get(i).getTimes() == 9) {
-									if (md.getData(listActions.get(i).getDataid()) == 0) {
-										handler.sendEmptyMessage(i);
-									}
-								} else {
-									hashdata.put(listActions.get(i).getDataid(), hashdata.get(listActions.get(i).getDataid()) + md.getData(listActions.get(i).getDataid()));
-								}
-							} else {
-								if (listActions.get(i).getDataid() == 31) {
-									// GPS角度偏差
-									if (hashdata.get(31) == -1) {
-										startAngle = md.getData(31);
-										hashdata.put(31, 0);
-									} else {
-										if (listActions.get(i).getMax() > 0) {
-											if (md.getData(31) - startAngle > listActions.get(i).getMax()) {
-												handler.sendEmptyMessage(i);
-											}
-										} else {
-											if (md.getData(31) - startAngle > hashdata.get(31)) {
-												hashdata.put(31, md.getData(31) - startAngle);
-											}
-										}
-									}
-								} else {
-									// 速度、转速、GPS速度
-									if (listActions.get(i).getMax() > 0) {
-										if (md.getData(listActions.get(i).getDataid()) > listActions.get(i).getMax()) {
-											handler.sendEmptyMessage(i);
-										}
-									}
-									if (listActions.get(i).getMin() > 0) {
-										if (md.getData(listActions.get(i).getDataid()) < listActions.get(i).getMin()) {
-											handler.sendEmptyMessage(i);
-										}
-									}
-								}
-							}
-						}
-					}
-				} else {
-					if (!execing && routeid == 1 && currId > -1) {
-						if (itemList.size() > currId + 1) {
-							runOnUiThread(new Runnable() {
-								public void run() {
-									try {
-										speak(itemList.get(currId + 1).get("tts").toString(), currId + 1);
-									} catch (NumberFormatException e) {
-										e.printStackTrace();
-									}
-								}
-							});
-						}
-					}
-				}
 			}
 		}, 1000, 1000);
 	}
 
-	private void resetdata() {
-		for (int i = 0; i < 16; i++) {
-			hashdata.put(i, 0);
-		}
-		hashdata.put(31, -1);
-	}
-
 	private void execItem(int index) {
-		listActions.clear();
-		@SuppressWarnings("unchecked")
-		HashMap<String, Object> map = (HashMap<String, Object>) gridView.getItemAtPosition(index);
-		Cursor cursor = md.rawQuery("select a.*,b.name as errname,b.fenshu from " + DBer.T_ITEM_ACTION + " a left join " + DBer.T_ITEM_ERR + " b on a.errid=b.errid where a.itemid="
-				+ map.get("itemid"));
+		Cursor cursor = md.rawQuery("select a.*,b.name as errname,b.fenshu from " + DBer.T_ITEM_ACTION + " a left join " + DBer.T_ITEM_ERR + " b on a.errid=b.errid where a.itemid=" + itemList.get(index).get("itemid"));
 		if (cursor.moveToFirst()) {
+			if (itemManager._listActions == null) {
+				itemManager._listActions = new ArrayList<Action>();
+			}
+			itemManager._listActions.clear();
 			do {
 				Action action = new Action();
 				if (routeid == 1) {
-					action.setItemname("灯光");
+					action.Itemname = "灯光";
 				} else {
-					action.setItemname(map.get("itemname").toString());
+					action.Itemname = itemList.get(index).get("itemname").toString();
 				}
-				action.setDataid(cursor.getInt(cursor.getColumnIndex("dataid")));
-				action.setTimes(cursor.getInt(cursor.getColumnIndex("times")));
-				action.setMin(cursor.getInt(cursor.getColumnIndex("min")));
-				action.setMax(cursor.getInt(cursor.getColumnIndex("max")));
-				action.setErr(cursor.getString(cursor.getColumnIndex("errname")));
-				action.setFenshu(cursor.getInt(cursor.getColumnIndex("fenshu")));
-				listActions.add(action);
+				action.Dataid = cursor.getInt(cursor.getColumnIndex("dataid"));
+				action.Times = cursor.getInt(cursor.getColumnIndex("times"));
+				action.Min = cursor.getInt(cursor.getColumnIndex("min"));
+				action.Max = cursor.getInt(cursor.getColumnIndex("max"));
+				action.Err = cursor.getString(cursor.getColumnIndex("errname"));
+				action.Fenshu = cursor.getInt(cursor.getColumnIndex("fenshu"));
+				action.Step = cursor.getInt(cursor.getColumnIndex("step"));
+				itemManager._listActions.add(action);
 			} while (cursor.moveToNext());
 			cursor.close();
-			resetdata();
-			this._timeout = Integer.parseInt(map.get("timeout").toString());
-			Log.i("exam", "start execute " + map.get("itemname").toString() + ",timeout:" + this._timeout);
-		} else {
-			execing = false;
+			itemManager.setTimeout(Integer.parseInt(itemList.get(index).get("timeout").toString()));
+			itemManager.Start();
 		}
-	}
-
-	private void addListItem(int index) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("itemname", listActions.get(index).getItemname());
-		map.put("fenshu", listActions.get(index).getFenshu());
-		map.put("errname", listActions.get(index).getErr());
-		errList.add(map);
-		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList);
-		listView.setAdapter(adapter);
-		fenshu -= listActions.get(index).getFenshu();
-		if (fenshu < 0) {
-			fenshu = 0;
-		}
-		if (fenshu < 90) {
-			if (_timeout > 1) {
-				_timeout = 1;
-			}
-			speak("考试不合格,您的扣分项目为," + listActions.get(index).getErr());
-		}
-		txtDefen.setText(String.valueOf(fenshu));
 	}
 
 	private void delListItem(int index) {
@@ -415,7 +328,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				md.setGPSSpeed(location.getSpeed());
 				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
-				if (!execing && location.getLatitude() != 0) {
+				if (itemManager._pause && location.getLatitude() != 0) {
 					for (int i = 0; i < itemList.size(); i++) {
 						if (Float.parseFloat(itemList.get(i).get("lat").toString()) != 0f) {
 							Location loa = new Location("reverseGeocoded");
@@ -466,18 +379,15 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		if (index > -1) {
 			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where itemid=" + itemList.get(index).get("itemid"));
 			if (cursor.getCount() > 0) {
-				execing = true;
-				currId = index;
 				HashMap<String, String> myHashAlarm = new HashMap<String, String>();
 				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(index));
 				mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 			} else {
-				currId = itemList.size();
 				Toast.makeText(ExamActivity.this, "该项目还没有设置评判条件,请在[系统设置]-[项目设置]里设置", Toast.LENGTH_SHORT).show();
 			}
 		} else {
 			HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-			myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(index));
+			myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "-1");
 			mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 		}
 	}
@@ -538,6 +448,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			_timerSerial.cancel();
 			_timer = null;
 			_timerSerial = null;
+			itemManager.Destroy();
 			ExamActivity.this.finish();
 		}
 		return false;

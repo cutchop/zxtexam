@@ -24,9 +24,9 @@ public class Metadata extends Application {
 	private float lat = 0f;
 	private float lon = 0f;
 	private SharedPreferences settings;
-	private static final String[] DEF_XINHAO_NAME = { "信号1", "信号2", "信号3", "信号4", "信号5", "信号6", "信号7", "信号8", "信号9", "信号10", "信号11", "信号12", "信号13", "信号14", "信号15", "信号16" };
-	private static final String[] DEF_MAICHONG_NAME = { "速度", "转速" };
-	private static final float[] DEF_MAICHONG_XS = { 0.75f, 1f };// 脉冲修正系数
+	private static final String[] DEF_XINHAO_NAME = { "夜行灯", "近光灯", "远光灯", "左转向灯", "右转向灯", "停车制动器", "应急灯", "行车制动器", "点火信号", "雾灯", "信号11", "信号12", "车门", "信号14", "喇叭", "信号16" };
+	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
+	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
 	private static final int DEF_RANGE = 30;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
@@ -34,7 +34,7 @@ public class Metadata extends Application {
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 5;
+	private static final int DBVERSION = 6;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;

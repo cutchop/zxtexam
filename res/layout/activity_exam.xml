@@ -115,7 +115,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/title_bg"
         android:gravity="center|left"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingBottom="2dp"
         android:paddingLeft="5dp"
         android:paddingTop="2dp" >
@@ -126,6 +126,12 @@
             android:layout_height="wrap_content"
             android:text="考试项目列表：(随机路线)"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <CheckBox
+            android:id="@+id/cbAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自动执行" />
 
     </LinearLayout>
 

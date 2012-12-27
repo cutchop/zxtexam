@@ -37,7 +37,7 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 		Bundle bundle = new Bundle();
 		bundle.putInt("itemid", Integer.parseInt(preference.getKey().substring(4)));
 		intent.putExtras(bundle);
-		intent.setClass(ItemsActivity.this, ItemEditActivity.class);
+		intent.setClass(ItemsActivity.this, ItemStepActivity.class);
 		startActivity(intent);
 		return false;
 	}

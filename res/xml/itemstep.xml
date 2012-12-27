@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <EditTextPreference android:title="项目名称" android:key="ie_name"/>
+    <EditTextPreference android:title="语音提示" android:key="ie_tts"/>
+    <EditTextPreference android:title="时长" android:key="ie_timeout"/>
+    <PreferenceCategory android:title="步骤">
+        <Preference android:key="step1" android:title="步骤1"/>
+        <Preference android:key="step2" android:title="步骤2"/>
+        <Preference android:key="step3" android:title="步骤3"/>
+        <Preference android:key="step4" android:title="步骤4"/>
+        <Preference android:key="step5" android:title="步骤5"/>
+        <Preference android:key="step6" android:title="步骤6"/>
+        <Preference android:key="step7" android:title="步骤7"/>	
+    </PreferenceCategory>
+</PreferenceScreen>

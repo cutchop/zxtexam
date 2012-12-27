@@ -22,7 +22,7 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ROUTE_ITEM + " (routeid INTEGER,itemid INTEGER,lon FLOAT,lat FLOAT)");
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM + " (itemid INTEGER PRIMARY KEY,name VARCHAR(20),tts VARCHAR(100),timeout INTEGER)");
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM_ERR + " (errid INTEGER PRIMARY KEY,itemid INTEGER,name VARCHAR(100),fenshu INTEGER)");
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM_ACTION + " (itemid INTEGER,dataid INTEGER,times INTEGER,min INTEGER,max INTEGER,errid INTEGER)");
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + T_ITEM_ACTION + " (itemid INTEGER,dataid INTEGER,times INTEGER,min INTEGER,max INTEGER,errid INTEGER,step INTEGER)");
 		// 项目
 		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (0, '上车准备', '上车准备', 20)");
 		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (1, '起步', '起步', 20)");

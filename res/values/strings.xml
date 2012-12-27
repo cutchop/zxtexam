@@ -1,6 +1,8 @@
 <resources>
 
     <string name="app_name">模拟考试</string>
+    <string name="version">1.0</string>
+    <string name="server">http://221.232.160.197</string>
     <string name="error_configuration">请先设置串口.</string>
     <string name="error_security">您没有权限读写这个串口.</string>
     <string name="error_unknown">串口打开失败.</string>

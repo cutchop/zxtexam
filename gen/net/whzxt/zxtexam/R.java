@@ -49,15 +49,16 @@ public final class R {
         public static final int titlebg=0x7f020005;
     }
     public static final class id {
-        public static final int btnName=0x7f0a0027;
-        public static final int btnRgpp=0x7f0a0020;
-        public static final int btnStop=0x7f0a0021;
-        public static final int btnTts=0x7f0a0029;
-        public static final int gridView1=0x7f0a001f;
+        public static final int btnName=0x7f0a0028;
+        public static final int btnRgpp=0x7f0a0021;
+        public static final int btnStop=0x7f0a0022;
+        public static final int btnTts=0x7f0a002a;
+        public static final int cbAuto=0x7f0a001f;
+        public static final int gridView1=0x7f0a0020;
         public static final int layDefen=0x7f0a001b;
-        public static final int layDetect=0x7f0a0025;
-        public static final int layStart=0x7f0a0023;
-        public static final int laySystem=0x7f0a0024;
+        public static final int layDetect=0x7f0a0026;
+        public static final int layStart=0x7f0a0024;
+        public static final int laySystem=0x7f0a0025;
         public static final int listView1=0x7f0a0001;
         public static final int tableRow1=0x7f0a0002;
         public static final int tableRow2=0x7f0a0006;
@@ -85,12 +86,12 @@ public final class R {
         public static final int textView8=0x7f0a000c;
         public static final int textView9=0x7f0a000d;
         public static final int txtDefen=0x7f0a001d;
-        public static final int txtName=0x7f0a0026;
+        public static final int txtName=0x7f0a0027;
         public static final int txtReception=0x7f0a001a;
         public static final int txtRouteName=0x7f0a001e;
-        public static final int txtStatus=0x7f0a0022;
+        public static final int txtStatus=0x7f0a0023;
         public static final int txtTime=0x7f0a001c;
-        public static final int txtTts=0x7f0a0028;
+        public static final int txtTts=0x7f0a0029;
     }
     public static final class layout {
         public static final int activity_choose=0x7f030000;
@@ -105,9 +106,11 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f080000;
-        public static final int error_configuration=0x7f080001;
-        public static final int error_security=0x7f080002;
-        public static final int error_unknown=0x7f080003;
+        public static final int error_configuration=0x7f080003;
+        public static final int error_security=0x7f080004;
+        public static final int error_unknown=0x7f080005;
+        public static final int server=0x7f080002;
+        public static final int version=0x7f080001;
     }
     public static final class style {
         public static final int AppTheme=0x7f090000;
@@ -115,6 +118,7 @@ public final class R {
     public static final class xml {
         public static final int itemedit=0x7f040000;
         public static final int itemsettings=0x7f040001;
-        public static final int systemsettings=0x7f040002;
+        public static final int itemstep=0x7f040002;
+        public static final int systemsettings=0x7f040003;
     }
 }
