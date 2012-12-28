@@ -29,7 +29,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -40,6 +42,7 @@ public class MainActivity extends Activity {
 	private int _fileLength, _downedFileLength = 0;
 	private static final int H_W_UPDATEDIALOG_MAX = 0x01;
 	private static final int H_W_UPDATEDIALOG_NOW = 0x02;
+	private Metadata md;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -63,6 +66,7 @@ public class MainActivity extends Activity {
 		layStart = (LinearLayout) findViewById(R.id.layStart);
 		laySystem = (LinearLayout) findViewById(R.id.laySystem);
 		layDetect = (LinearLayout) findViewById(R.id.layDetect);
+		md = (Metadata)getApplication();
 		layStart.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				startActivity(new Intent().setClass(MainActivity.this, ChooseActivity.class));
@@ -70,7 +74,21 @@ public class MainActivity extends Activity {
 		});
 		laySystem.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				startActivity(new Intent().setClass(MainActivity.this, SystemActivity.class));
+				final EditText txtpsd = new EditText(MainActivity.this);
+				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请输入密码").setIcon(android.R.drawable.ic_menu_help).setView(txtpsd).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {						
+						if (txtpsd.getText().toString().toLowerCase().equals(md.getPassword().toLowerCase())) {
+							startActivity(new Intent().setClass(MainActivity.this, SystemActivity.class));
+						} else {
+							Toast.makeText(MainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
+						}
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
+				alertDialog.show();
 			}
 		});
 		layDetect.setOnClickListener(new OnClickListener() {

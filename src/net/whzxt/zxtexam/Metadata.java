@@ -34,7 +34,7 @@ public class Metadata extends Application {
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 6;
+	private static final int DBVERSION = 16;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -148,6 +148,12 @@ public class Metadata extends Application {
 		}
 		if (id < 30) {
 			return settings.getString("name" + id, DEF_MAICHONG_NAME[id - 20]);
+		}
+		if (id == 30) {
+			return "GPS速度";
+		}
+		if (id == 31) {
+			return "GPS角度";
 		}
 		return "";
 	}

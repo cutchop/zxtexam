@@ -1,6 +1,12 @@
 package net.whzxt.zxtexam;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -9,6 +15,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.text.InputType;
+import android.widget.Toast;
 
 public class SystemActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 	private Metadata md;
@@ -39,6 +46,9 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		// 扣分设置
 		preference = findPreference("ErrSetting");
 		preference.setOnPreferenceClickListener(this);
+		// 导出数据
+		preference = findPreference("exportdata");
+		preference.setOnPreferenceClickListener(this);
 		// 脉冲系数
 		for (int i = 1; i < 10; i++) {
 			preference = findPreference("maichongxs" + i);
@@ -54,15 +64,15 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		preference.setOnPreferenceChangeListener(this);
 		// 串口
-		ListPreference devices = (ListPreference)findPreference("device");
-        String[] entries = md.mSerialPortFinder.getAllDevices();
-        String[] entryValues = md.mSerialPortFinder.getAllDevicesPath();
+		ListPreference devices = (ListPreference) findPreference("device");
+		String[] entries = md.mSerialPortFinder.getAllDevices();
+		String[] entryValues = md.mSerialPortFinder.getAllDevicesPath();
 		devices.setEntries(entries);
 		devices.setEntryValues(entryValues);
 		devices.setSummary(devices.getValue());
 		devices.setOnPreferenceChangeListener(this);
 		// 波特率
-		ListPreference baudrates = (ListPreference)findPreference("baudrate");
+		ListPreference baudrates = (ListPreference) findPreference("baudrate");
 		baudrates.setSummary(baudrates.getValue());
 		baudrates.setOnPreferenceChangeListener(this);
 	}
@@ -95,9 +105,9 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			}
 			preference.setTitle("阈值：" + newValue);
 		} else if (preference.getKey().equals("device")) {
-			preference.setSummary((String)newValue);
+			preference.setSummary((String) newValue);
 		} else if (preference.getKey().equals("baudrate")) {
-			preference.setSummary((String)newValue);
+			preference.setSummary((String) newValue);
 		}
 		return true;
 	}
@@ -109,6 +119,104 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			startActivity(new Intent().setClass(SystemActivity.this, ErrSettingsActivity.class));
 		} else if (preference.getKey().equals("RouteSetting")) {
 			startActivity(new Intent().setClass(SystemActivity.this, RouteActivity.class));
+		} else if (preference.getKey().equals("exportdata")) {
+			Toast.makeText(SystemActivity.this, "正在导出,请稍候...", Toast.LENGTH_LONG).show();
+			StringBuffer sBuffer = new StringBuffer();
+			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by itemid");
+			if (cursor.moveToFirst()) {
+				do {
+					sBuffer.append("db.execSQL(\"INSERT INTO ");
+					sBuffer.append(DBer.T_ITEM);
+					sBuffer.append("(itemid, name, tts, timeout) VALUES (");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
+					sBuffer.append(",");
+					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append(",");
+					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("tts"))+"'");
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("timeout")));
+					sBuffer.append(")\");\n");
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ERR + " order by errid");
+			if (cursor.moveToFirst()) {
+				do {
+					sBuffer.append("db.execSQL(\"INSERT INTO ");
+					sBuffer.append(DBer.T_ITEM_ERR);
+					sBuffer.append("(errid, itemid, name, fenshu) VALUES (");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("errid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
+					sBuffer.append(",");
+					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("fenshu")));
+					sBuffer.append(")\");\n");
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			cursor = md.rawQuery("select * from " + DBer.T_ROUTE + " order by routeid");
+			if (cursor.moveToFirst()) {
+				do {
+					sBuffer.append("db.execSQL(\"INSERT INTO ");
+					sBuffer.append(DBer.T_ROUTE);
+					sBuffer.append("(routeid, name, tts) VALUES (");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
+					sBuffer.append(",");
+					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append(",");
+					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("tts"))+"'");
+					sBuffer.append(")\");\n");
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " order by routeid,itemid");
+			if (cursor.moveToFirst()) {
+				do {
+					sBuffer.append("db.execSQL(\"INSERT INTO ");
+					sBuffer.append(DBer.T_ROUTE_ITEM);
+					sBuffer.append("(routeid, itemid) VALUES (");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
+					sBuffer.append(")\");\n");
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " order by itemid,step,dataid");
+			if (cursor.moveToFirst()) {
+				do {
+					sBuffer.append("db.execSQL(\"INSERT INTO ");
+					sBuffer.append(DBer.T_ITEM_ACTION);
+					sBuffer.append("(itemid,dataid,times,min,max,errid,step) VALUES (");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("dataid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("times")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("min")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("max")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("errid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("step")));
+					sBuffer.append(")\");\n");
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			try {
+				OutputStream outstream = new FileOutputStream("/sdcard/zxtexam.data", false);
+				OutputStreamWriter out = new OutputStreamWriter(outstream);
+				out.write(sBuffer.toString());
+				out.close();
+				Toast.makeText(SystemActivity.this, "数据已导出到/sdcard/zxtexam.data", Toast.LENGTH_SHORT).show();
+			} catch (IOException e) {
+				Toast.makeText(SystemActivity.this, "导出数据时出现异常", Toast.LENGTH_SHORT).show();
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}

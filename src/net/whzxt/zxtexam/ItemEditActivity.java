@@ -131,7 +131,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		((ListPreference) preference).setEntryValues(errvalues);
 		preference.setOnPreferenceChangeListener(this);
 
-		cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where itemid=" + id + " order by dataid");
+		cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where step=" + step + " and itemid=" + id + " order by dataid");
 		if (cursor.moveToFirst()) {
 			do {
 				id = cursor.getInt(cursor.getColumnIndex("dataid"));
@@ -177,32 +177,32 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		if (key.startsWith("ie_action_")) {
 			if (key.endsWith("_times")) {
 				String id = key.replace("ie_action_", "").replace("_times", "");
-				md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=" + arg1 + " where itemid=" + itemid + " and dataid=" + id);
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(timesmap.get(arg1));
 			} else if (key.endsWith("_err")) {
 				String id = key.replace("ie_action_", "").replace("_err", "");
-				md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + arg1 + " where itemid=" + itemid + " and dataid=" + id);
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(errmap.get(arg1));
 			} else if (key.endsWith("_min")) {
 				if (arg1.toString().equals("")) {
 					return false;
 				}
 				String id = key.replace("ie_action_", "").replace("_min", "");
-				md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + arg1 + " where itemid=" + itemid + " and dataid=" + id);
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(arg1.toString());
 			} else if (key.endsWith("_max")) {
 				if (arg1.toString().equals("")) {
 					return false;
 				}
 				String id = key.replace("ie_action_", "").replace("_max", "");
-				md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + arg1 + " where itemid=" + itemid + " and dataid=" + id);
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(arg1.toString());
 			} else {
 				String id = key.replace("ie_action_", "");
 				if ((Boolean) arg1) {
 					md.execSQL("INSERT INTO " + DBer.T_ITEM_ACTION + " (itemid, dataid, times, min, max, errid, step) VALUES (" + itemid + "," + id + ",0,0,0,999," + step + ")");
 				} else {
-					md.execSQL("delete from " + DBer.T_ITEM_ACTION + " where itemid=" + itemid + " and dataid=" + id);
+					md.execSQL("delete from " + DBer.T_ITEM_ACTION + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 					findPreference(key + "_err").setSummary("");
 					if (findPreference(key + "_times") != null) {
 						findPreference(key + "_times").setSummary("");

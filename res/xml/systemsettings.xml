@@ -38,4 +38,7 @@
 		<ListPreference android:key="device" android:title="串口" android:persistent="true"></ListPreference>
 		<ListPreference android:entries="@array/baudrates_name" android:entryValues="@array/baudrates_value" android:key="baudrate" android:persistent="true" android:title="波特率"></ListPreference>
     </PreferenceCategory>
+    <PreferenceCategory android:title="其他">
+        <Preference android:key="exportdata" android:title="导出数据"/>
+    </PreferenceCategory>    
 </PreferenceScreen>

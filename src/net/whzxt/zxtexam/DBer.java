@@ -39,8 +39,10 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (12, '请将前大灯换成远光' ,'请将前大灯换成远光', 5)");
 		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (13, '夜间同向近距离跟车行驶','夜间同向近距离跟车行驶', 5)");
 		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (14, '夜间通过坡路、拱桥','夜间通过坡路、拱桥', 5)");
-		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (15, '夜间在道路上发生故障，妨碍交通又难以移动','夜间在道路上发生故障，妨碍交通又难以移动', 5)");
-		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (16, '模拟夜间考试完成，请关闭所有灯光','模拟夜间考试完成，请关闭所有灯光', 5)");
+		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (15, '夜间在窄路与非机动车会车','夜间在窄路与非机动车会车', 5)");
+		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (16, '雾天行驶','雾天行驶', 5)");
+		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (17, '夜间在道路上发生故障，妨碍交通又难以移动','夜间在道路上发生故障，妨碍交通又难以移动', 5)");
+		db.execSQL("INSERT INTO " + T_ITEM + " (itemid, name, tts, timeout) VALUES (18, '模拟夜间考试完成，请关闭所有灯光','模拟夜间考试完成，请关闭所有灯光', 5)");
 		// 扣分项
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (0,0, '不绕车一周检查车辆外观及安全状况', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (1,0, '打开车门前不观察后方交通情况', 100)");
@@ -57,8 +59,8 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (11,1, '启动发动机前，不调整驾驶座椅、后视镜、检查仪表', 5)");
 		
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (12,2, '方向控制不稳，不能保持车辆直线运动状态', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (13,2, '不了解车辆行驶速度', 10)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (14,2, '未及时发现路面障碍物，未及时采取减速措施', 10)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (13,2, '不了解车辆行驶速度', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (14,2, '未及时发现路面障碍物，未及时采取减速措施', 100)");
 		
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (15,3, '变更车道时，判断车辆安全距离不合理，妨碍其他车辆正常行驶', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (16,3, '连续变更两条以上车道', 100)");
@@ -94,10 +96,9 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (40,9, '掉头地点选择不当', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (41,9, '掉头时，妨碍正常行驶的其他车辆和行人通行', 100)");
 		
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (42,10, '不能正确开启灯光', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (43,10, '同方向近距离跟车行驶时，使用远光灯', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (44,10, '通过急弯、坡路、拱桥、人行横道或者没有交通信号灯控制的路口时，不交替使用远、近光灯示意', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (45,10, '会车时不按规定使用灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (43,13, '同方向近距离跟车行驶时，使用远光灯', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (44,14, '通过急弯、坡路、拱桥、人行横道或者没有交通信号灯控制的路口时，不交替使用远、近光灯示意', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (45,15, '会车时不按规定使用灯光', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (46,10, '在路口转弯时，使用远光灯', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (47,10, '超车时未变换使用远、近光灯提醒被超越车辆', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (48,10, '在有路灯、照明良好的道路上行驶时，使用远光灯', 100)");
@@ -105,9 +106,15 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (49,11, '不能正确开启灯光', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (50,12, '不能正确开启灯光', 100)");
 		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (51,13, '不能正确开启灯光', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (52,14, '不能正确开启灯光', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (53,15, '不能正确开启灯光', 100)");
-		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (54,16, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (52,14, '夜间通过坡路、拱桥时，没有交替使用远、近光灯示意', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (53,14, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (54,17, '在路边临时停车没有关闭前照灯(1)', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (57,17, '在路边临时停车没有开启警示灯(2)', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (58,17, '在路边临时停车没有开启警示灯(3)', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (59,17, '在路边临时停车没有开启警示灯(4)', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (60,17, '在路边临时停车没有关闭前照灯(5)', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (55,18, '不能正确开启灯光', 100)");
+		db.execSQL("INSERT INTO " + T_ITEM_ERR + " (errid, itemid, name, fenshu) VALUES (56,16, '不能正确开启灯光', 100)");
 		// 路线
 		db.execSQL("INSERT INTO " + T_ROUTE + " (routeid, name, tts) VALUES (0, '随机路线', '当前为随机路线')");
 		db.execSQL("INSERT INTO " + T_ROUTE + " (routeid, name, tts) VALUES (1, '灯光', '下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作')");
@@ -122,7 +129,7 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (0, 7)");
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (0, 8)");
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (0, 9)");
-		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (0, 10)");
+		//db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (0, 10)");
 		
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 11)");
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 12)");
@@ -130,6 +137,37 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 14)");
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 15)");
 		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 16)");
+		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 17)");
+		db.execSQL("INSERT INTO " + T_ROUTE_ITEM + " (routeid, itemid) VALUES (1, 18)");
+		
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(11,0,2,0,0,49,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(12,2,2,0,0,50,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(13,1,2,0,0,43,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(13,2,1,0,0,51,1)");
+		
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(14,2,2,0,0,52,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(14,1,2,0,0,52,2)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(14,2,2,0,0,52,3)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(14,1,2,0,0,52,4)");
+
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(15,2,1,0,0,45,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(15,1,2,0,0,45,1)");
+		
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(16,9,2,0,0,56,1)");
+
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(17,0,-2,0,0,54,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(17,6,-2,0,0,57,2)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(17,6,2,0,0,58,3)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(17,6,-2,0,0,59,4)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(17,0,1,0,0,61,5)");
+		
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,0,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,1,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,2,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,3,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,4,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,6,1,0,0,55,1)");
+		db.execSQL("INSERT INTO " + T_ITEM_ACTION + "(itemid,dataid,times,min,max,errid,step) values(18,9,1,0,0,55,1)");
 	}
 
 	@Override

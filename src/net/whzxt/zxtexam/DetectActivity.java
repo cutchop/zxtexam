@@ -18,9 +18,7 @@ import android.widget.TextView;
 @SuppressLint("HandlerLeak")
 public class DetectActivity extends SerialPortActivity {
 
-	private TextView textView0, textView1, textView2, textView3, textView4,
-			textView5, textView6, textView7, textView8, textView9, textView10,
-			textView11, textView12, textView13, textView14, textView15;
+	private TextView textView0, textView1, textView2, textView3, textView4, textView5, textView6, textView7, textView8, textView9, textView10, textView11, textView12, textView13, textView14, textView15;
 	private TextView textView20, textView21;
 	private TextView textView30, textView31, textView32;
 	private EditText txtReception;
@@ -134,8 +132,7 @@ public class DetectActivity extends SerialPortActivity {
 			}
 		}, 50, 50);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				1000, 0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
 		changeGPS();
 	}
 
@@ -154,8 +151,7 @@ public class DetectActivity extends SerialPortActivity {
 			// log it when the location changes
 			if (location != null) {
 				md.setGPSSpeed(location.getSpeed());
-				md.setGPSLatlon((float) location.getLatitude(),
-						(float) location.getLongitude());
+				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
 				changeGPS();
 			}
@@ -175,43 +171,25 @@ public class DetectActivity extends SerialPortActivity {
 	};
 
 	private void changeSerial() {
-		textView0.setBackgroundResource(md.getData(0) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView1.setBackgroundResource(md.getData(1) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView2.setBackgroundResource(md.getData(2) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView3.setBackgroundResource(md.getData(3) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView4.setBackgroundResource(md.getData(4) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView5.setBackgroundResource(md.getData(5) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView6.setBackgroundResource(md.getData(6) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView7.setBackgroundResource(md.getData(7) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView8.setBackgroundResource(md.getData(8) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView9.setBackgroundResource(md.getData(9) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView10.setBackgroundResource(md.getData(10) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView11.setBackgroundResource(md.getData(11) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView12.setBackgroundResource(md.getData(12) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView13.setBackgroundResource(md.getData(13) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView14.setBackgroundResource(md.getData(14) == 1 ? R.color.lighton
-				: R.color.lightoff);
-		textView15.setBackgroundResource(md.getData(15) == 1 ? R.color.lighton
-				: R.color.lightoff);
+		textView0.setBackgroundResource(md.getData(0) == 1 ? R.color.lighton : R.color.lightoff);
+		textView1.setBackgroundResource(md.getData(1) == 1 ? R.color.lighton : R.color.lightoff);
+		textView2.setBackgroundResource(md.getData(2) == 1 ? R.color.lighton : R.color.lightoff);
+		textView3.setBackgroundResource(md.getData(3) == 1 ? R.color.lighton : R.color.lightoff);
+		textView4.setBackgroundResource(md.getData(4) == 1 ? R.color.lighton : R.color.lightoff);
+		textView5.setBackgroundResource(md.getData(5) == 1 ? R.color.lighton : R.color.lightoff);
+		textView6.setBackgroundResource(md.getData(6) == 1 ? R.color.lighton : R.color.lightoff);
+		textView7.setBackgroundResource(md.getData(7) == 1 ? R.color.lighton : R.color.lightoff);
+		textView8.setBackgroundResource(md.getData(8) == 1 ? R.color.lighton : R.color.lightoff);
+		textView9.setBackgroundResource(md.getData(9) == 1 ? R.color.lighton : R.color.lightoff);
+		textView10.setBackgroundResource(md.getData(10) == 1 ? R.color.lighton : R.color.lightoff);
+		textView11.setBackgroundResource(md.getData(11) == 1 ? R.color.lighton : R.color.lightoff);
+		textView12.setBackgroundResource(md.getData(12) == 1 ? R.color.lighton : R.color.lightoff);
+		textView13.setBackgroundResource(md.getData(13) == 1 ? R.color.lighton : R.color.lightoff);
+		textView14.setBackgroundResource(md.getData(14) == 1 ? R.color.lighton : R.color.lightoff);
+		textView15.setBackgroundResource(md.getData(15) == 1 ? R.color.lighton : R.color.lightoff);
 
-		textView20.setBackgroundResource(md.getData(20) == 0 ? R.color.lightoff
-				: R.color.lighton);
-		textView21.setBackgroundResource(md.getData(21) == 0 ? R.color.lightoff
-				: R.color.lighton);
+		textView20.setBackgroundResource(md.getData(20) == 0 ? R.color.lightoff : R.color.lighton);
+		textView21.setBackgroundResource(md.getData(21) == 0 ? R.color.lightoff : R.color.lighton);
 		if (md.getData(20) == 0) {
 			textView20.setText(md.getName(20));
 		} else {
@@ -222,15 +200,15 @@ public class DetectActivity extends SerialPortActivity {
 		} else {
 			textView21.setText(md.getName(21) + ":" + md.getData(21));
 		}
+		// 角度(debug)
+		textView31.setBackgroundResource(md.getData(31) == 0 ? R.color.lightoff : R.color.lighton);
+		textView31.setText("GPS角度:" + md.getData(31) + "度");
 	}
 
 	private void changeGPS() {
-		textView30.setBackgroundResource(md.getData(30) == 0 ? R.color.lightoff
-				: R.color.lighton);
-		textView31.setBackgroundResource(md.getData(31) == 0 ? R.color.lightoff
-				: R.color.lighton);
-		textView32.setBackgroundResource(md.getLatLonString().equals(
-				"0.000000,0.000000") ? R.color.lightoff : R.color.lighton);
+		textView30.setBackgroundResource(md.getData(30) == 0 ? R.color.lightoff : R.color.lighton);
+		textView31.setBackgroundResource(md.getData(31) == 0 ? R.color.lightoff : R.color.lighton);
+		textView32.setBackgroundResource(md.getLatLonString().equals("0.000000,0.000000") ? R.color.lightoff : R.color.lighton);
 
 		textView30.setText("GPS速度:" + md.getData(30) + "km/h");
 		textView31.setText("GPS角度:" + md.getData(31) + "度");
@@ -241,58 +219,58 @@ public class DetectActivity extends SerialPortActivity {
 	protected void onDataReceived(byte[] buffer, int size) {
 		data = "";
 		for (int i = 0; i < size; i++) {
-			if (Integer.toHexString(buffer[i]&0xFF).length() == 1) {
-				data += "0"+Integer.toHexString(buffer[i]&0xFF)+" ";
+			if (Integer.toHexString(buffer[i] & 0xFF).length() == 1) {
+				data += "0" + Integer.toHexString(buffer[i] & 0xFF) + " ";
 			} else {
-				data += Integer.toHexString(buffer[i]&0xFF)+" ";
+				data += Integer.toHexString(buffer[i] & 0xFF) + " ";
 			}
 		}
 		data = data.toUpperCase();
 		handler.sendEmptyMessage(2);
-		if (buffer[0] == 0x1A && buffer[size-1] == 0x1D) {
+		if (buffer[0] == 0x1A && buffer[size - 1] == 0x1D) {
 			String bfs = data;
 			bfs = bfs.replace(" ", "").replace("1B11", "1A").replace("1B14", "1D").replace("1B0B", "1B");
 			int t1 = 0;
 			int t2 = 0;
 			for (int i = 2; i < 20; i++) {
-				t1 += Integer.parseInt(bfs.substring(i,i+2),16);
+				t1 += Integer.parseInt(bfs.substring(i, i + 2), 16);
 				i++;
 			}
-			for (int i = 24; i < 32; i++) {
-				t2 += Integer.parseInt(bfs.substring(i,i+2),16);
-				i++;
-			}
+			t2 = Integer.parseInt(bfs.substring(26, 28) + bfs.substring(24, 26), 16);
 			if (t1 != t2) {
 				return;
 			}
-			if (bfs.substring(2, 4).equals("02")) {				
-				String str = md.toBinaryString(Integer.parseInt(bfs.substring(4,6),16));
+			// debug
+			if (Integer.parseInt(bfs.substring(28, 30) + bfs.substring(30, 32), 16) > 0) {
+				md.setData(31, Integer.parseInt(bfs.substring(28, 30) + bfs.substring(30, 32), 16));
+			}
+			if (bfs.substring(2, 4).equals("02")) {
+				String str = md.toBinaryString(Integer.parseInt(bfs.substring(4, 6), 16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
-						md.setData(7-i, 1);
+						md.setData(7 - i, 1);
 					} else {
-						md.setData(7-i, 0);
+						md.setData(7 - i, 0);
 					}
 				}
-				str = md.toBinaryString(Integer.parseInt(bfs.substring(6,8),16));
+				str = md.toBinaryString(Integer.parseInt(bfs.substring(6, 8), 16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
-						md.setData(15-i, 1);
+						md.setData(15 - i, 1);
 					} else {
-						md.setData(15-i, 0);
+						md.setData(15 - i, 0);
 					}
 				}
-				md.setData(20, Integer.parseInt(bfs.substring(10,12)+bfs.substring(8,10),16));				
-				md.setData(21, Integer.parseInt(bfs.substring(18,20)+bfs.substring(16,18),16));
+				md.setData(20, Integer.parseInt(bfs.substring(10, 12) + bfs.substring(8, 10), 16));
+				md.setData(21, Integer.parseInt(bfs.substring(18, 20) + bfs.substring(16, 18), 16));
 				handler.sendEmptyMessage(0);
 			}
 		}
 	}
-	
+
 	private void appendText() {
 		txtReception.setText(data);
 	}
-	
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

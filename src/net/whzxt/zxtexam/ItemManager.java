@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 public class ItemManager {
 	public static interface OnStatusChange {
-		public abstract void onFault(Action action);
+		public abstract void onFault(int index);
 
 		public abstract void onStop();
 	}
@@ -17,7 +16,7 @@ public class ItemManager {
 	private final int Period = 100;
 	public ArrayList<Action> _listActions;
 	public Boolean _pause = true;
-	private int _timeout;	
+	private int _timeout;
 	private OnStatusChange _onStatusChange;
 	private HashMap<Integer, Integer> _hashdata;
 	private Metadata _md;
@@ -40,7 +39,8 @@ public class ItemManager {
 						// 扣分
 						for (int i = 0; i < _listActions.size(); i++) {
 							if (_listActions.get(i).Step == _step && !_listActions.get(i).IsOK) {
-								_onStatusChange.onFault(_listActions.get(i));
+								_onStatusChange.onFault(i);
+								break;
 							}
 						}
 						// 结束
@@ -56,10 +56,12 @@ public class ItemManager {
 								} else if (_listActions.get(i).Dataid == 31) {
 									if (_listActions.get(i).Min > 0) {
 										_stepfinish = false;
+										break;
 									}
 								} else {
-									if (_listActions.get(i).Min > 0 && _listActions.get(i).Max == 0){
+									if (_listActions.get(i).Min > 0 && _listActions.get(i).Max == 0) {
 										_stepfinish = false;
+										break;
 									}
 								}
 							}
@@ -74,17 +76,36 @@ public class ItemManager {
 								}
 							}
 							if (!hasStep) {
+								for (int i = 0; i < _listActions.size(); i++) {
+									if (_listActions.get(i).Step == _step - 1) {
+										if (_listActions.get(i).Dataid < 20) {
+											if (Math.abs(_listActions.get(i).Times) == 1) {
+												_step--;
+												hasStep = true;
+												break;
+											}
+										} else {
+											if (_listActions.get(i).Max > 0) {
+												_step--;
+												hasStep = true;
+												break;
+											}
+										}
+									}
+								}
+							}
+							if (!hasStep) {
 								Stop();
-								return;
+								return;	
 							}
 						}
 						for (int i = 0; i < _listActions.size(); i++) {
-							if (_listActions.get(i).Step == _step && !_listActions.get(i).IsOK) {
+							if (_listActions.get(i).Step == _step) {
 								if (_listActions.get(i).Dataid < 20) {
 									switch (_listActions.get(i).Times) {
 									case 1:
 										if (_md.getData(_listActions.get(i).Dataid) == 1) {
-											_onStatusChange.onFault(_listActions.get(i));
+											_onStatusChange.onFault(i);
 											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
 												Stop();
 											}
@@ -92,7 +113,7 @@ public class ItemManager {
 										break;
 									case -1:
 										if (_md.getData(_listActions.get(i).Dataid) == 0) {
-											_onStatusChange.onFault(_listActions.get(i));
+											_onStatusChange.onFault(i);
 											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
 												Stop();
 											}
@@ -157,7 +178,7 @@ public class ItemManager {
 									} else {
 										if (_listActions.get(i).Max > 0) {
 											if (_md.getData(31) - _startAngle > _listActions.get(i).Max) {
-												_onStatusChange.onFault(_listActions.get(i));
+												_onStatusChange.onFault(i);
 												if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
 													Stop();
 													break;
@@ -172,7 +193,7 @@ public class ItemManager {
 								} else {
 									if (_listActions.get(i).Max > 0 && _listActions.get(i).Min > 0) {
 										if (_md.getData(_listActions.get(i).Dataid) > _listActions.get(i).Max || _md.getData(_listActions.get(i).Dataid) < _listActions.get(i).Min) {
-											_onStatusChange.onFault(_listActions.get(i));
+											_onStatusChange.onFault(i);
 											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
 												Stop();
 												break;
@@ -181,7 +202,7 @@ public class ItemManager {
 									} else {
 										if (_listActions.get(i).Max > 0) {
 											if (_md.getData(_listActions.get(i).Dataid) > _listActions.get(i).Max) {
-												_onStatusChange.onFault(_listActions.get(i));
+												_onStatusChange.onFault(i);
 												if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
 													Stop();
 													break;
@@ -213,8 +234,8 @@ public class ItemManager {
 		_pause = true;
 		_onStatusChange.onStop();
 	}
-	
-	public void Destroy(){ 
+
+	public void Destroy() {
 		_timer.cancel();
 		_timer = null;
 	}

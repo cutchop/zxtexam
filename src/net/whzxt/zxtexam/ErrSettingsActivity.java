@@ -28,12 +28,12 @@ public class ErrSettingsActivity extends Activity {
 		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
 		if (cursor.moveToFirst()) {
 			do {
-				Map<String, String> datum = new HashMap<String, String>(2);
+				Map<String, String> datum = new HashMap<String, String>();
 				datum.put("name", cursor.getString(cursor.getColumnIndex("name")));
 				datum.put("fenshu", cursor.getString(cursor.getColumnIndex("itemname")) + "  " + cursor.getString(cursor.getColumnIndex("fenshu")) + "分");
 				data.add(datum);
 			} while (cursor.moveToNext());
-		}
+		}		
 		cursor.close();
 		listView.setAdapter(new SimpleAdapter(this, data, android.R.layout.simple_expandable_list_item_2, new String[] { "name", "fenshu" }, new int[] { android.R.id.text1, android.R.id.text2 }));
 		listView.setOnItemClickListener(new OnItemClickListener() {
