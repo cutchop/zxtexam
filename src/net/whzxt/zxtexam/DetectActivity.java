@@ -132,7 +132,7 @@ public class DetectActivity extends SerialPortActivity {
 			}
 		}, 50, 50);
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, locationListener);
 		changeGPS();
 	}
 

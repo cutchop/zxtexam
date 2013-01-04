@@ -122,12 +122,12 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		} else if (preference.getKey().equals("exportdata")) {
 			Toast.makeText(SystemActivity.this, "正在导出,请稍候...", Toast.LENGTH_LONG).show();
 			StringBuffer sBuffer = new StringBuffer();
-			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by itemid");
+			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM);
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ITEM);
-					sBuffer.append("(itemid, name, tts, timeout) VALUES (");
+					sBuffer.append("(itemid, name, tts, timeout, type) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
 					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
@@ -135,11 +135,13 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("tts"))+"'");
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("timeout")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("type")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
-			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ERR + " order by errid");
+			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ERR);
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
@@ -156,7 +158,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
-			cursor = md.rawQuery("select * from " + DBer.T_ROUTE + " order by routeid");
+			cursor = md.rawQuery("select * from " + DBer.T_ROUTE);
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
@@ -171,7 +173,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
-			cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " order by routeid,itemid");
+			cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM);
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
@@ -184,7 +186,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
-			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " order by itemid,step,dataid");
+			cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION);
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");

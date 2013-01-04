@@ -4,26 +4,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" android:padding="5dp">
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="路线名称："
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:padding="5dp" >
 
-    <EditText
-        android:id="@+id/txtName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:ems="10" android:enabled="false">
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="路线名称："
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <requestFocus />
-    </EditText>
+        <EditText
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:enabled="false" >
+
+            <requestFocus />
+        </EditText>
 
     <Button
         android:id="@+id/btnName"
@@ -56,6 +58,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="修改" />
+
+</LinearLayout>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:padding="5dp">
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="自动执行："
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radAutoTrue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="是" />
+
+        <RadioButton
+            android:id="@+id/radAutoFalse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="否" android:layout_marginLeft="5dp"/>
+    </RadioGroup>
 
 </LinearLayout>
 

@@ -21,8 +21,11 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -31,6 +34,7 @@ public class RouteEditActivity extends Activity {
 	private EditText txtName, txtTts;
 	private Button btnName, btnTts;
 	private ListView listView;
+	private RadioButton radAutoTrue, radAutoFalse;
 	private Metadata md;
 	private int routeid;
 	private List<String> data;
@@ -50,6 +54,8 @@ public class RouteEditActivity extends Activity {
 		btnName = (Button) findViewById(R.id.btnName);
 		btnTts = (Button) findViewById(R.id.btnTts);
 		listView = (ListView) findViewById(R.id.listView1);
+		radAutoFalse = (RadioButton) findViewById(R.id.radAutoFalse);
+		radAutoTrue = (RadioButton) findViewById(R.id.radAutoTrue);
 
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
@@ -59,6 +65,7 @@ public class RouteEditActivity extends Activity {
 			if (cursor.moveToFirst()) {
 				txtName.setText(cursor.getString(cursor.getColumnIndex("name")));
 				txtTts.setText(cursor.getString(cursor.getColumnIndex("tts")));
+				radAutoFalse.setChecked(cursor.getInt(cursor.getColumnIndex("auto")) == 0);
 			}
 			cursor.close();
 		} else {
@@ -69,6 +76,13 @@ public class RouteEditActivity extends Activity {
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
 
+		radAutoTrue.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (routeid > -1) {
+					md.execSQL("update " + DBer.T_ROUTE + " set auto=" + (radAutoTrue.isChecked() ? 1 : 0) + " where routeid=" + routeid);
+				}
+			}
+		});
 		btnName.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (btnName.getText().equals("修改")) {
@@ -147,60 +161,54 @@ public class RouteEditActivity extends Activity {
 						bdjwd = true;
 						if (md.getLatlon()[0] != 0) {
 							String[] strs = { "绑定当前位置:" + md.getLatLonString(), "不绑定位置信息" };
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help)
-									.setItems(strs, new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											if (which == 1) {
-												bdjwd = false;
-											}
-											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
-													.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-														public void onClick(DialogInterface dialog, int which) {
-															return;
-														}
-													}).create();
-											dialog2.show();
-										}
-									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-							alertDialog.show();
-						} else {
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help)
-									.setPositiveButton("继续", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											bdjwd = false;
-											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect)
-													.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-														public void onClick(DialogInterface dialog, int which) {
-															return;
-														}
-													}).create();
-											dialog2.show();
-										}
-									})
-									.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-							alertDialog.show();
-						}
-					}
-				} else {
-					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要删除该项目？").setIcon(android.R.drawable.ic_menu_help)
-							.setPositiveButton("是", new DialogInterface.OnClickListener() {
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help).setItems(strs, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-									load();
+									if (which == 1) {
+										bdjwd = false;
+									}
+									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+									dialog2.show();
 								}
-							}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
 									return;
 								}
 							}).create();
+							alertDialog.show();
+						} else {
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("继续", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									bdjwd = false;
+									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+									dialog2.show();
+								}
+							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									return;
+								}
+							}).create();
+							alertDialog.show();
+						}
+					}
+				} else {
+					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要删除该项目？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+							load();
+						}
+					}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							return;
+						}
+					}).create();
 					alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
 						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
 							if (keyCode == KeyEvent.KEYCODE_HOME)

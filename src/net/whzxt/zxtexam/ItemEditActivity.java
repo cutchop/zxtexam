@@ -2,6 +2,8 @@ package net.whzxt.zxtexam;
 
 import java.util.HashMap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -14,7 +16,10 @@ import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class ItemEditActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 
@@ -148,7 +153,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		cursor.close();
 	}
 
-	public boolean onPreferenceChange(Preference arg0, Object arg1) {
+	public boolean onPreferenceChange(final Preference arg0, final Object arg1) {
 		String key = arg0.getKey();
 		if (key.equals("ie_name")) {
 			if (arg1.toString().trim().equals("")) {
@@ -180,9 +185,33 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 				md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(timesmap.get(arg1));
 			} else if (key.endsWith("_err")) {
-				String id = key.replace("ie_action_", "").replace("_err", "");
+				final String id = key.replace("ie_action_", "").replace("_err", "");
 				md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(errmap.get(arg1));
+				final EditText txtAppend = new EditText(ItemEditActivity.this);
+				AlertDialog alertDialog = new AlertDialog.Builder(ItemEditActivity.this).setTitle("如果要附加说明，请输入然后点击确定，否则点击取消").setIcon(android.R.drawable.ic_menu_add).setView(txtAppend).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						if (txtAppend.getText().toString().trim().equals("")) {
+							return;
+						}
+						Cursor cur = md.rawQuery("select max(errid)+1 as id from " + DBer.T_ITEM_ERR);
+						if (cur.moveToFirst()) {
+							md.execSQL("insert into " + DBer.T_ITEM_ERR + "(errid, itemid, name, fenshu) select " + cur.getInt(0) + " as errid,itemid,name||'(" + txtAppend.getText() + ")' as name,fenshu from " + DBer.T_ITEM_ERR + " where errid=" + arg1);
+							md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + cur.getInt(0) + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);							
+							errmap.put(String.valueOf(cur.getInt(0)), errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
+							Log.i("exam", errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
+							arg0.setSummary(errmap.get(String.valueOf(cur.getInt(0))));
+						} else {
+							Toast.makeText(ItemEditActivity.this, "出现错误,请重试", Toast.LENGTH_SHORT).show();
+						}
+						cur.close();
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
+				alertDialog.show();
 			} else if (key.endsWith("_min")) {
 				if (arg1.toString().equals("")) {
 					return false;

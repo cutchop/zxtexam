@@ -24,7 +24,7 @@ public class Metadata extends Application {
 	private float lat = 0f;
 	private float lon = 0f;
 	private SharedPreferences settings;
-	private static final String[] DEF_XINHAO_NAME = { "夜行灯", "近光灯", "远光灯", "左转向灯", "右转向灯", "停车制动器", "应急灯", "行车制动器", "点火信号", "雾灯", "信号11", "信号12", "车门", "信号14", "喇叭", "信号16" };
+	private static final String[] DEF_XINHAO_NAME = { "示宽灯", "近光灯", "远光灯", "左转向灯", "右转向灯", "停车制动器", "应急灯", "行车制动器", "点火信号", "雾灯", "信号11", "信号12", "车门", "信号14", "喇叭", "信号16" };
 	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
 	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
@@ -34,7 +34,7 @@ public class Metadata extends Application {
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 16;
+	private static final int DBVERSION = 21;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -136,6 +136,14 @@ public class Metadata extends Application {
 			return gpsangle;
 		}
 		return 0;
+	}
+	
+	public String get16DataString(){
+		StringBuffer sBuffer =new StringBuffer();
+		for (int i = 0; i < 16; i++) {
+			sBuffer.append(data_Xinhao.get(i));
+		}
+		return sBuffer.toString();
 	}
 
 	public int getRange() {
