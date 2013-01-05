@@ -16,9 +16,10 @@
         <EditTextPreference android:title="最小值" android:key="ie_action_30_min" android:dependency="ie_action_30"/>
         <EditTextPreference android:title="最大值" android:key="ie_action_30_max" android:dependency="ie_action_30"/>
         <ListPreference android:title="扣分项" android:key="ie_action_30_err" android:dependency="ie_action_30"/>
-        <CheckBoxPreference android:key="ie_action_31" android:title="GPS角度偏差"/>
-        <EditTextPreference android:title="最小值" android:key="ie_action_31_min" android:dependency="ie_action_31"/>
-        <EditTextPreference android:title="最大值" android:key="ie_action_31_max" android:dependency="ie_action_31"/>
+        <CheckBoxPreference android:key="ie_action_31" android:title="GPS角度"/>
+        <ListPreference android:title="方向" android:key="ie_action_31_fanx" android:dependency="ie_action_31"/>
+        <EditTextPreference android:title="偏差最小值" android:key="ie_action_31_min" android:dependency="ie_action_31"/>
+        <EditTextPreference android:title="偏差最大值" android:key="ie_action_31_max" android:dependency="ie_action_31"/>
         <ListPreference android:title="扣分项" android:key="ie_action_31_err" android:dependency="ie_action_31"/>
         
         <CheckBoxPreference android:title="信号1" android:key="ie_action_0"/>

@@ -35,7 +35,7 @@ public class ErrSettingsActivity extends Activity {
 		md = (Metadata) getApplication();
 
 		itemList = new ArrayList<Map<String, Object>>();
-		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by itemid");
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
 		if (cursor.moveToFirst()) {
 			do {
 				Map<String, Object> map = new HashMap<String, Object>();
@@ -53,73 +53,79 @@ public class ErrSettingsActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
 				if (arg2 == 0) {
 					// 添加
-					AlertDialog alertDialog = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请选择所属项目").setIcon(android.R.drawable.ic_menu_add).setItems(itemnames, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							tempitemid = Integer.parseInt(itemList.get(which).get("itemid").toString());
-							final EditText txtName = new EditText(ErrSettingsActivity.this);
-							AlertDialog alertDialog2 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请输入扣分说明").setIcon(android.R.drawable.ic_menu_add).setView(txtName).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					AlertDialog alertDialog = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请选择所属项目").setIcon(android.R.drawable.ic_menu_add)
+							.setItems(itemnames, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									if (txtName.getText().toString().trim().equals("")) {
-										return;
-									}
-									AlertDialog alertDialog3 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请设定分数").setIcon(android.R.drawable.ic_menu_add).setItems(fenshus, new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											Cursor cur = md.rawQuery("select max(errid)+1 as id from " + DBer.T_ITEM_ERR);
-											if (cur.moveToFirst()) {
-												md.execSQL("insert into " + DBer.T_ITEM_ERR + "(errid, itemid, name, fenshu) values(" + cur.getInt(0) + "," + tempitemid + ",'" + txtName.getText() + "'," + fenshus[which] + ")");
-												Toast.makeText(ErrSettingsActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
-												reload();
-											} else {
-												Toast.makeText(ErrSettingsActivity.this, "出现错误,请重试", Toast.LENGTH_SHORT).show();
-											}
-											cur.close();
-										}
-									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-									alertDialog3.show();
+									tempitemid = Integer.parseInt(itemList.get(which).get("itemid").toString());
+									final EditText txtName = new EditText(ErrSettingsActivity.this);
+									AlertDialog alertDialog2 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请输入扣分说明").setIcon(android.R.drawable.ic_menu_add).setView(txtName)
+											.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int which) {
+													if (txtName.getText().toString().trim().equals("")) {
+														return;
+													}
+													AlertDialog alertDialog3 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请设定分数").setIcon(android.R.drawable.ic_menu_add)
+															.setItems(fenshus, new DialogInterface.OnClickListener() {
+																public void onClick(DialogInterface dialog, int which) {
+																	Cursor cur = md.rawQuery("select max(errid)+1 as id from " + DBer.T_ITEM_ERR);
+																	if (cur.moveToFirst()) {
+																		md.execSQL("insert into " + DBer.T_ITEM_ERR + "(errid, itemid, name, fenshu) values(" + cur.getInt(0) + "," + tempitemid + ",'"
+																				+ txtName.getText() + "'," + fenshus[which] + ")");
+																		Toast.makeText(ErrSettingsActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+																		reload();
+																	} else {
+																		Toast.makeText(ErrSettingsActivity.this, "出现错误,请重试", Toast.LENGTH_SHORT).show();
+																	}
+																	cur.close();
+																}
+															}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+																public void onClick(DialogInterface dialog, int which) {
+																	return;
+																}
+															}).create();
+													alertDialog3.show();
+												}
+											}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int which) {
+													return;
+												}
+											}).create();
+									alertDialog2.show();
 								}
 							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
 									return;
 								}
 							}).create();
-							alertDialog2.show();
-						}
-					}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							return;
-						}
-					}).create();
 					alertDialog.show();
 				} else {
-					AlertDialog alertDialog = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("修改", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							final EditText txtName = new EditText(ErrSettingsActivity.this);
-							txtName.setText(data.get(arg2 - 1).get("name").toString());
-							AlertDialog alertDialog2 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请输入扣分说明").setIcon(android.R.drawable.ic_menu_add).setView(txtName).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					AlertDialog alertDialog = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help)
+							.setPositiveButton("修改", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									if (txtName.getText().toString().trim().equals("")) {
-										return;
-									}
-									md.execSQL("update " + DBer.T_ITEM_ERR + " set name='" + txtName.getText().toString() + "' where errid=" + data.get(arg2 - 1).get("errid"));
-									Toast.makeText(ErrSettingsActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+									final EditText txtName = new EditText(ErrSettingsActivity.this);
+									txtName.setText(data.get(arg2 - 1).get("name").toString());
+									AlertDialog alertDialog2 = new AlertDialog.Builder(ErrSettingsActivity.this).setTitle("请输入扣分说明").setIcon(android.R.drawable.ic_menu_add).setView(txtName)
+											.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int which) {
+													if (txtName.getText().toString().trim().equals("")) {
+														return;
+													}
+													md.execSQL("update " + DBer.T_ITEM_ERR + " set name='" + txtName.getText().toString() + "' where errid=" + data.get(arg2 - 1).get("errid"));
+													Toast.makeText(ErrSettingsActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+												}
+											}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int which) {
+													return;
+												}
+											}).create();
+									alertDialog2.show();
 								}
-							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+							}).setNegativeButton("删除", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									return;
+									md.execSQL("delete from " + DBer.T_ITEM_ERR + " where errid=" + data.get(arg2 - 1).get("errid"));
+									Toast.makeText(ErrSettingsActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
 								}
 							}).create();
-							alertDialog2.show();
-						}
-					}).setNegativeButton("删除", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							md.execSQL("delete from " + DBer.T_ITEM_ERR + " where errid=" + data.get(arg2 - 1).get("errid"));
-							Toast.makeText(ErrSettingsActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
-						}
-					}).create();
 					alertDialog.show();
 				}
 			}
@@ -138,13 +144,17 @@ public class ErrSettingsActivity extends Activity {
 		map.put("name", "添加新扣分项...");
 		map.put("fenshu", "");
 		data.add(map);
-		Cursor cursor = md.rawQuery("select a.errid,a.name,a.fenshu,b.name as itemname from " + DBer.T_ITEM_ERR + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid order by b.itemid,a.errid");
+		Cursor cursor = md.rawQuery("select a.errid,a.name,a.fenshu,b.name as itemname,b.type from " + DBer.T_ITEM_ERR + " a left join " + DBer.T_ITEM
+				+ " b on a.itemid=b.itemid order by b.type,b.xuhao,a.errid");
 		if (cursor.moveToFirst()) {
 			do {
 				Map<String, String> datum = new HashMap<String, String>();
 				datum.put("errid", cursor.getString(cursor.getColumnIndex("errid")));
 				datum.put("name", cursor.getString(cursor.getColumnIndex("name")));
-				datum.put("fenshu", cursor.getString(cursor.getColumnIndex("itemname")) + "  " + cursor.getString(cursor.getColumnIndex("fenshu")) + "分");
+				datum.put(
+						"fenshu",
+						"[" + (cursor.getInt(cursor.getColumnIndex("type")) == 0 ? "路考" : "灯光") + "]" + cursor.getString(cursor.getColumnIndex("itemname")) + "  "
+								+ cursor.getString(cursor.getColumnIndex("fenshu")) + "分");
 				data.add(datum);
 			} while (cursor.moveToNext());
 		}

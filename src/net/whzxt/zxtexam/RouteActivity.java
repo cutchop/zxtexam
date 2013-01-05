@@ -52,7 +52,7 @@ public class RouteActivity extends Activity {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		data.add("添加路线");
+		data.add("添加路线...");
 		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
 	}
 

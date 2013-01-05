@@ -11,6 +11,8 @@ public final class R {
     public static final class array {
         public static final int baudrates_name=0x7f050000;
         public static final int baudrates_value=0x7f050001;
+        public static final int resources_name=0x7f050002;
+        public static final int resources_value=0x7f050003;
     }
     public static final class attr {
     }
@@ -49,19 +51,20 @@ public final class R {
         public static final int titlebg=0x7f020005;
     }
     public static final class id {
-        public static final int btnName=0x7f0a0027;
+        public static final int btnName=0x7f0a0028;
         public static final int btnRgpp=0x7f0a0020;
         public static final int btnStop=0x7f0a0021;
-        public static final int btnTts=0x7f0a0029;
+        public static final int btnTts=0x7f0a002a;
         public static final int gridView1=0x7f0a001f;
         public static final int layDefen=0x7f0a001b;
-        public static final int layDetect=0x7f0a0025;
+        public static final int layDetect=0x7f0a0026;
+        public static final int layRoute=0x7f0a0025;
         public static final int layStart=0x7f0a0023;
         public static final int laySystem=0x7f0a0024;
         public static final int listView1=0x7f0a0001;
-        public static final int radAutoFalse=0x7f0a002c;
-        public static final int radAutoTrue=0x7f0a002b;
-        public static final int radioGroup1=0x7f0a002a;
+        public static final int radAutoFalse=0x7f0a002d;
+        public static final int radAutoTrue=0x7f0a002c;
+        public static final int radioGroup1=0x7f0a002b;
         public static final int tableRow1=0x7f0a0002;
         public static final int tableRow2=0x7f0a0006;
         public static final int tableRow3=0x7f0a000b;
@@ -88,12 +91,12 @@ public final class R {
         public static final int textView8=0x7f0a000c;
         public static final int textView9=0x7f0a000d;
         public static final int txtDefen=0x7f0a001d;
-        public static final int txtName=0x7f0a0026;
+        public static final int txtName=0x7f0a0027;
         public static final int txtReception=0x7f0a001a;
         public static final int txtRouteName=0x7f0a001e;
         public static final int txtStatus=0x7f0a0022;
         public static final int txtTime=0x7f0a001c;
-        public static final int txtTts=0x7f0a0028;
+        public static final int txtTts=0x7f0a0029;
     }
     public static final class layout {
         public static final int activity_choose=0x7f030000;

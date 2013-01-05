@@ -23,6 +23,7 @@ public class ItemManager {
 	private int _startAngle; // 开始时的GPS角度
 	private int _step;
 	private Boolean _stepfinish;
+	private int _fenshu = 100;
 
 	public ItemManager(OnStatusChange osc, Metadata md) {
 		_md = md;
@@ -39,8 +40,23 @@ public class ItemManager {
 						// 扣分
 						for (int i = 0; i < _listActions.size(); i++) {
 							if (_listActions.get(i).Step == _step && !_listActions.get(i).IsOK) {
-								_onStatusChange.onFault(i);
-								break;
+								if (_listActions.get(i).Dataid < 20) {
+									if (Math.abs(_listActions.get(i).Times) > 1) {
+										_onStatusChange.onFault(i);
+										_fenshu = _fenshu - _listActions.get(i).Fenshu;
+										if (_fenshu < 90) {
+											break;
+										}
+									}
+								} else {
+									if (Math.abs(_listActions.get(i).Min) > 0 && _listActions.get(i).Max == 0) {
+										_onStatusChange.onFault(i);
+										_fenshu = _fenshu - _listActions.get(i).Fenshu;
+										if (_fenshu < 90) {
+											break;
+										}
+									}
+								}
 							}
 						}
 						// 结束
@@ -51,15 +67,12 @@ public class ItemManager {
 						for (int i = 0; i < _listActions.size(); i++) {
 							if (_listActions.get(i).Step == _step && !_listActions.get(i).IsOK) {
 								if (_listActions.get(i).Dataid < 20) {
-									_stepfinish = false;
-									break;
-								} else if (_listActions.get(i).Dataid == 31) {
-									if (_listActions.get(i).Min > 0) {
+									if (Math.abs(_listActions.get(i).Times) > 1) {
 										_stepfinish = false;
 										break;
 									}
 								} else {
-									if (_listActions.get(i).Min > 0 && _listActions.get(i).Max == 0) {
+									if (Math.abs(_listActions.get(i).Min) > 0 && _listActions.get(i).Max == 0) {
 										_stepfinish = false;
 										break;
 									}
@@ -85,7 +98,7 @@ public class ItemManager {
 												break;
 											}
 										} else {
-											if (_listActions.get(i).Max > 0) {
+											if (Math.abs(_listActions.get(i).Max) > 0) {
 												_step--;
 												hasStep = true;
 												break;
@@ -96,7 +109,7 @@ public class ItemManager {
 							}
 							if (!hasStep) {
 								Stop();
-								return;	
+								return;
 							}
 						}
 						for (int i = 0; i < _listActions.size(); i++) {
@@ -105,17 +118,25 @@ public class ItemManager {
 									switch (_listActions.get(i).Times) {
 									case 1:
 										if (_md.getData(_listActions.get(i).Dataid) == 1) {
-											_onStatusChange.onFault(i);
-											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
-												Stop();
+											if (_listActions.get(i).IsOK) {
+												_listActions.get(i).IsOK = false;
+												_onStatusChange.onFault(i);
+												_fenshu = _fenshu - _listActions.get(i).Fenshu;
+												if (_fenshu < 90) {
+													Stop();
+												}
 											}
 										}
 										break;
 									case -1:
 										if (_md.getData(_listActions.get(i).Dataid) == 0) {
-											_onStatusChange.onFault(i);
-											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
-												Stop();
+											if (_listActions.get(i).IsOK) {
+												_listActions.get(i).IsOK = false;
+												_onStatusChange.onFault(i);
+												_fenshu = _fenshu - _listActions.get(i).Fenshu;
+												if (_fenshu < 90) {
+													Stop();
+												}
 											}
 										}
 										break;
@@ -176,16 +197,24 @@ public class ItemManager {
 									if (_startAngle == -1) {
 										_startAngle = _md.getData(31);
 									} else {
-										if (_listActions.get(i).Max > 0) {
-											if (_md.getData(31) - _startAngle > _listActions.get(i).Max) {
-												_onStatusChange.onFault(i);
-												if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
-													Stop();
-													break;
+										int angle = _md.getData(31) - _startAngle;
+										if (angle > 200) {
+											angle = (360 - angle) * -1;
+										}
+										if (Math.abs(_listActions.get(i).Max) > 0) {
+											if ((_listActions.get(i).Max > 0 && angle > _listActions.get(i).Max) || (_listActions.get(i).Max < 0 && angle < _listActions.get(i).Max)) {
+												if (_listActions.get(i).IsOK) {
+													_listActions.get(i).IsOK = false;
+													_onStatusChange.onFault(i);
+													_fenshu = _fenshu - _listActions.get(i).Fenshu;
+													if (_fenshu < 90) {
+														Stop();
+														break;
+													}
 												}
 											}
-										} else if (_listActions.get(i).Min > 0) {
-											if (_md.getData(31) - _startAngle > _listActions.get(i).Min) {
+										} else if (Math.abs(_listActions.get(i).Min) > 0) {
+											if ((_listActions.get(i).Min > 0 && angle > _listActions.get(i).Min) || (_listActions.get(i).Min < 0 && angle < _listActions.get(i).Min)) {
 												_listActions.get(i).IsOK = true;
 											}
 										}
@@ -193,19 +222,27 @@ public class ItemManager {
 								} else {
 									if (_listActions.get(i).Max > 0 && _listActions.get(i).Min > 0) {
 										if (_md.getData(_listActions.get(i).Dataid) > _listActions.get(i).Max || _md.getData(_listActions.get(i).Dataid) < _listActions.get(i).Min) {
-											_onStatusChange.onFault(i);
-											if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
-												Stop();
-												break;
+											if (_listActions.get(i).IsOK) {
+												_listActions.get(i).IsOK = false;
+												_onStatusChange.onFault(i);
+												_fenshu = _fenshu - _listActions.get(i).Fenshu;
+												if (_fenshu < 90) {
+													Stop();
+													break;
+												}
 											}
 										}
 									} else {
 										if (_listActions.get(i).Max > 0) {
 											if (_md.getData(_listActions.get(i).Dataid) > _listActions.get(i).Max) {
-												_onStatusChange.onFault(i);
-												if (_listActions.get(i).Fenshu > 10) {// 扣分超过10分,结束
-													Stop();
-													break;
+												if (_listActions.get(i).IsOK) {
+													_listActions.get(i).IsOK = false;
+													_onStatusChange.onFault(i);
+													_fenshu = _fenshu - _listActions.get(i).Fenshu;
+													if (_fenshu < 90) {
+														Stop();
+														break;
+													}
 												}
 											}
 										} else if (_listActions.get(i).Min > 0) {
@@ -238,6 +275,10 @@ public class ItemManager {
 	public void Destroy() {
 		_timer.cancel();
 		_timer = null;
+	}
+
+	public void setFenshu(int fenshu) {
+		_fenshu = fenshu;
 	}
 
 	public void setTimeout(int timeout) {

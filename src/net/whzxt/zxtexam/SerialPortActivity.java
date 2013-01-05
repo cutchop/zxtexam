@@ -7,6 +7,7 @@ import java.security.InvalidParameterException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
@@ -25,11 +26,12 @@ public abstract class SerialPortActivity extends Activity {
 		@Override
 		public void run() {
 			super.run();
-			while(!isInterrupted()) {
+			while (!isInterrupted()) {
 				int size;
 				try {
+					if (mInputStream == null)
+						return;
 					byte[] buffer = new byte[32];
-					if (mInputStream == null) return;
 					size = mInputStream.read(buffer);
 					if (size >= 17) {
 						onDataReceived(buffer, size);
@@ -58,20 +60,34 @@ public abstract class SerialPortActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		md = (Metadata) getApplication();
-		try {
-			mSerialPort = md.getSerialPort();
-			mOutputStream = mSerialPort.getOutputStream();
-			mInputStream = mSerialPort.getInputStream();
+		if (md.getDataResourceType() == 0) {
+			// 串口
+			try {
+				mSerialPort = md.getSerialPort();
+				mOutputStream = mSerialPort.getOutputStream();
+				mInputStream = mSerialPort.getInputStream();
 
-			/* Create a receiving thread */
-			mReadThread = new ReadThread();
-			mReadThread.start();
-		} catch (SecurityException e) {
-			DisplayError(R.string.error_security);
-		} catch (IOException e) {
-			DisplayError(R.string.error_unknown);
-		} catch (InvalidParameterException e) {
-			DisplayError(R.string.error_configuration);
+				/* Create a receiving thread */
+				mReadThread = new ReadThread();
+				mReadThread.start();
+			} catch (SecurityException e) {
+				DisplayError(R.string.error_security);
+				e.printStackTrace();
+			} catch (IOException e) {
+				DisplayError(R.string.error_unknown);
+				e.printStackTrace();
+			} catch (InvalidParameterException e) {
+				DisplayError(R.string.error_configuration);
+				e.printStackTrace();
+			}
+		} else {
+			// 蓝牙
+			BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
+			if (!mAdapter.isEnabled()) {
+				mAdapter.enable();
+			}
+			// 搜索设备
+			
 		}
 	}
 

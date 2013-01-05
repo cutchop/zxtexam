@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="系统设置">
+        <ListPreference android:entries="@array/resources_name" android:entryValues="@array/resources_value" android:key="dataresourcetype" android:persistent="true" android:title="数据来源"></ListPreference>
 	    <EditTextPreference android:title="密码设置" android:summary="点击修改管理员密码" android:key="password"/>
 	    <Preference android:key="RouteSetting" android:summary="设置考试路线" android:title="路线设置"/>
 	    <Preference android:key="ItemSetting" android:summary="设置考试项目" android:title="项目设置"/>

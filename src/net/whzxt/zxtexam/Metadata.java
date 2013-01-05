@@ -31,10 +31,11 @@ public class Metadata extends Application {
 	private static final int DEF_RANGE = 30;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
 	private static final String DEF_BAUDRATE = "115200";
+	private static final String DEF_DATARESOURCETYPE = "0";//0,串口;1,蓝牙
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 21;
+	private static final int DBVERSION = 25;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -170,6 +171,10 @@ public class Metadata extends Application {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("name" + id, val);
 		editor.commit();
+	}
+	
+	public int getDataResourceType() {
+		return Integer.parseInt(settings.getString("dataresourcetype", DEF_DATARESOURCETYPE));
 	}
 
 	public String getPassword() {

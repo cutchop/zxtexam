@@ -35,7 +35,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	private LinearLayout layStart, laySystem, layDetect;
+	private LinearLayout layStart, laySystem, layRoute, layDetect;
 	private String strResult;
 	private ProgressDialog _updateDialog;
 	private File _downLoadFile;
@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		layStart = (LinearLayout) findViewById(R.id.layStart);
 		laySystem = (LinearLayout) findViewById(R.id.laySystem);
+		layRoute = (LinearLayout) findViewById(R.id.layRoute);
 		layDetect = (LinearLayout) findViewById(R.id.layDetect);
 		md = (Metadata)getApplication();
 		layStart.setOnClickListener(new OnClickListener() {
@@ -89,6 +90,11 @@ public class MainActivity extends Activity {
 					}
 				}).create();
 				alertDialog.show();
+			}
+		});
+		layRoute.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				startActivity(new Intent().setClass(MainActivity.this, RouteActivity.class));
 			}
 		});
 		layDetect.setOnClickListener(new OnClickListener() {
@@ -177,6 +183,7 @@ public class MainActivity extends Activity {
 						_downLoadFile.delete();
 					}
 					_downLoadFile.createNewFile();
+					@SuppressWarnings("resource")
 					OutputStream outputStream = new FileOutputStream(_downLoadFile);
 					_fileLength = connection.getContentLength();
 					handler.sendEmptyMessage(H_W_UPDATEDIALOG_MAX);

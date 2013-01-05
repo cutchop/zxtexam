@@ -75,6 +75,10 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		ListPreference baudrates = (ListPreference) findPreference("baudrate");
 		baudrates.setSummary(baudrates.getValue());
 		baudrates.setOnPreferenceChangeListener(this);
+		// 数据来源
+		preference = findPreference("dataresourcetype");
+		preference.setSummary(md.getDataResourceType() == 0 ? "串口" : "蓝牙");
+		preference.setOnPreferenceChangeListener(this);
 	}
 
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -108,6 +112,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			preference.setSummary((String) newValue);
 		} else if (preference.getKey().equals("baudrate")) {
 			preference.setSummary((String) newValue);
+		} else if (preference.getKey().equals("dataresourcetype")) {
+			preference.setSummary(newValue.toString().equals("0") ? "串口" : "蓝牙");
 		}
 		return true;
 	}
@@ -122,21 +128,23 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		} else if (preference.getKey().equals("exportdata")) {
 			Toast.makeText(SystemActivity.this, "正在导出,请稍候...", Toast.LENGTH_LONG).show();
 			StringBuffer sBuffer = new StringBuffer();
-			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM);
+			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
 			if (cursor.moveToFirst()) {
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ITEM);
-					sBuffer.append("(itemid, name, tts, timeout, type) VALUES (");
+					sBuffer.append("(itemid, name, tts, timeout, type, xuhao) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
-					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
 					sBuffer.append(",");
-					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("tts"))+"'");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("tts")) + "'");
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("timeout")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("type")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("xuhao")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
@@ -151,7 +159,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
-					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("fenshu")));
 					sBuffer.append(")\");\n");
@@ -163,12 +171,14 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE);
-					sBuffer.append("(routeid, name, tts) VALUES (");
+					sBuffer.append("(routeid, name, tts, auto) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
-					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("name"))+"'");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
 					sBuffer.append(",");
-					sBuffer.append("'"+cursor.getString(cursor.getColumnIndex("tts"))+"'");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("tts")) + "'");
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("auto")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
@@ -178,10 +188,16 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE_ITEM);
-					sBuffer.append("(routeid, itemid) VALUES (");
+					sBuffer.append("(routeid, itemid, lon, lat, xuhao) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("lon")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("lat")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("xuhao")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}

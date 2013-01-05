@@ -18,13 +18,14 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.itemsettings);
 		itemcategory = (PreferenceCategory) findPreference("itemcategory");
-		md = (Metadata)getApplication();
-		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by itemid");
+		md = (Metadata) getApplication();
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
 		if (cursor.moveToFirst()) {
 			do {
 				Preference preference = new Preference(this);
 				preference.setKey("item" + cursor.getInt(cursor.getColumnIndex("itemid")));
 				preference.setTitle(cursor.getString(cursor.getColumnIndex("name")));
+				preference.setSummary(cursor.getInt(cursor.getColumnIndex("type")) == 0 ? "路考" : "灯光");
 				preference.setOnPreferenceClickListener(this);
 				itemcategory.addPreference(preference);
 			} while (cursor.moveToNext());
