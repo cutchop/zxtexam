@@ -50,13 +50,19 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		preference = findPreference("exportdata");
 		preference.setOnPreferenceClickListener(this);
 		// 脉冲系数
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 5; i++) {
 			preference = findPreference("maichongxs" + i);
 			if (preference != null) {
 				preference.setTitle(md.getName(19 + i) + " = 脉冲" + i + " * " + md.getMaichongXS(i));
 				((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 				preference.setOnPreferenceChangeListener(this);
 			}
+		}
+		// GPS速度修正系数
+		preference = findPreference("gpsspeedxs");
+		if (preference != null) {
+			((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			preference.setOnPreferenceChangeListener(this);
 		}
 		// GPS阈值
 		preference = findPreference("range");
@@ -103,6 +109,16 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			}
 			int i = Integer.parseInt(preference.getKey().substring(10));
 			preference.setTitle(md.getName(19 + i) + " = 脉冲" + i + " * " + newValue);
+		} else if (preference.getKey().equals("gpsspeedxs")) {
+			if (newValue.toString().trim().equals("")) {
+				return false;
+			}
+			try {
+				Float.parseFloat(newValue.toString());
+			} catch (NumberFormatException e) {
+				return false;
+			}
+			preference.setTitle("GPS速度修正系数：" + newValue);
 		} else if (preference.getKey().equals("range")) {
 			if (newValue.toString().trim().equals("")) {
 				return false;

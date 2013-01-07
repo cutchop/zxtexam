@@ -28,14 +28,15 @@ public class Metadata extends Application {
 	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
 	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
-	private static final int DEF_RANGE = 30;
+	private static final int DEF_RANGE = 10;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
 	private static final String DEF_BAUDRATE = "115200";
-	private static final String DEF_DATARESOURCETYPE = "0";//0,串口;1,蓝牙
+	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
+	public static final int PERIOD = 100;// 100毫秒评判一次
 
 	private static float NMDIVIDED = 1.852f; // 海里换算成公里
 
-	private static final int DBVERSION = 25;
+	private static final int DBVERSION = 26;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -102,10 +103,9 @@ public class Metadata extends Application {
 	}
 
 	public int setGPSSpeed(float f) {
-		if (settings.getBoolean("haili", false)) {
-			gpsspeed = Math.round(f / NMDIVIDED * 60 * 60 / 1000);
-		} else {
-			gpsspeed = Math.round(f * 60 * 60 / 1000);
+		gpsspeed = Math.round(f * Float.parseFloat(settings.getString("gpsspeedxs", "1")) * 60 * 60 / 1000);
+		if (gpsspeed > 0 && getData(21) == 0) {
+			setData(21, gpsspeed);
 		}
 		return gpsspeed;
 	}
@@ -138,9 +138,9 @@ public class Metadata extends Application {
 		}
 		return 0;
 	}
-	
-	public String get16DataString(){
-		StringBuffer sBuffer =new StringBuffer();
+
+	public String get16DataString() {
+		StringBuffer sBuffer = new StringBuffer();
 		for (int i = 0; i < 16; i++) {
 			sBuffer.append(data_Xinhao.get(i));
 		}
@@ -172,9 +172,25 @@ public class Metadata extends Application {
 		editor.putString("name" + id, val);
 		editor.commit();
 	}
-	
+
 	public int getDataResourceType() {
 		return Integer.parseInt(settings.getString("dataresourcetype", DEF_DATARESOURCETYPE));
+	}
+
+	public void setDataResourceType(int t) {
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("dataresourcetype", String.valueOf(t));
+		editor.commit();
+	}
+
+	public String getBlueAddress() {
+		return settings.getString("blueaddress", "");
+	}
+
+	public void setBlueAddress(String address) {
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("blueaddress", address);
+		editor.commit();
 	}
 
 	public String getPassword() {

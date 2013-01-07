@@ -152,8 +152,13 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 					findPreference("ie_action_" + id + "_times").setSummary(timesmap.get(String.valueOf(cursor.getInt(cursor.getColumnIndex("times")))));
 				} else {
 					if (id == 31) {
-						findPreference("ie_action_" + id + "_min").setSummary(String.valueOf(Math.abs(cursor.getInt(cursor.getColumnIndex("min")))));
-						findPreference("ie_action_" + id + "_max").setSummary(String.valueOf(Math.abs(cursor.getInt(cursor.getColumnIndex("max")))));
+						if (cursor.getInt(cursor.getColumnIndex("min")) != 0 && cursor.getInt(cursor.getColumnIndex("max")) != 0) {
+							findPreference("ie_action_" + id + "_min").setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("min"))));
+							findPreference("ie_action_" + id + "_max").setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("max"))));
+						} else {
+							findPreference("ie_action_" + id + "_min").setSummary(String.valueOf(Math.abs(cursor.getInt(cursor.getColumnIndex("min")))));
+							findPreference("ie_action_" + id + "_max").setSummary(String.valueOf(Math.abs(cursor.getInt(cursor.getColumnIndex("max")))));
+						}
 						if (cursor.getInt(cursor.getColumnIndex("min")) > 0 || cursor.getInt(cursor.getColumnIndex("max")) > 0) {
 							findPreference("ie_action_31_fanx").setSummary("向右");
 							fanx = 1;
@@ -204,40 +209,37 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 				md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				arg0.setSummary(errmap.get(arg1));
 				final EditText txtAppend = new EditText(ItemEditActivity.this);
-				AlertDialog alertDialog = new AlertDialog.Builder(ItemEditActivity.this).setTitle("如果要附加说明，请输入然后点击确定，否则点击取消").setIcon(android.R.drawable.ic_menu_add).setView(txtAppend)
-						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								if (txtAppend.getText().toString().trim().equals("")) {
-									return;
-								}
-								Cursor cur = md.rawQuery("select max(errid)+1 as id from " + DBer.T_ITEM_ERR);
-								if (cur.moveToFirst()) {
-									md.execSQL("insert into " + DBer.T_ITEM_ERR + "(errid, itemid, name, fenshu) select " + cur.getInt(0) + " as errid,itemid,name||'(" + txtAppend.getText()
-											+ ")' as name,fenshu from " + DBer.T_ITEM_ERR + " where errid=" + arg1);
-									md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + cur.getInt(0) + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
-									errmap.put(String.valueOf(cur.getInt(0)), errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
-									Log.i("exam", errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
-									arg0.setSummary(errmap.get(String.valueOf(cur.getInt(0))));
-								} else {
-									Toast.makeText(ItemEditActivity.this, "出现错误,请重试", Toast.LENGTH_SHORT).show();
-								}
-								cur.close();
-							}
-						}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								return;
-							}
-						}).create();
+				AlertDialog alertDialog = new AlertDialog.Builder(ItemEditActivity.this).setTitle("如果要附加说明，请输入然后点击确定，否则点击取消").setIcon(android.R.drawable.ic_menu_add).setView(txtAppend).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						if (txtAppend.getText().toString().trim().equals("")) {
+							return;
+						}
+						Cursor cur = md.rawQuery("select max(errid)+1 as id from " + DBer.T_ITEM_ERR);
+						if (cur.moveToFirst()) {
+							md.execSQL("insert into " + DBer.T_ITEM_ERR + "(errid, itemid, name, fenshu) select " + cur.getInt(0) + " as errid,itemid,name||'(" + txtAppend.getText() + ")' as name,fenshu from " + DBer.T_ITEM_ERR + " where errid=" + arg1);
+							md.execSQL("update " + DBer.T_ITEM_ACTION + " set errid=" + cur.getInt(0) + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
+							errmap.put(String.valueOf(cur.getInt(0)), errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
+							Log.i("exam", errmap.get(arg1).toString() + "(" + txtAppend.getText().toString() + ")");
+							arg0.setSummary(errmap.get(String.valueOf(cur.getInt(0))));
+						} else {
+							Toast.makeText(ItemEditActivity.this, "出现错误,请重试", Toast.LENGTH_SHORT).show();
+						}
+						cur.close();
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
 				alertDialog.show();
 			} else if (key.endsWith("_min")) {
 				if (arg1.toString().equals("")) {
 					return false;
 				}
 				String id = key.replace("ie_action_", "").replace("_min", "");
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				if (id.equals("31")) {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
-				} else {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and max=0 and step=" + step);
 				}
 				arg0.setSummary(arg1.toString());
 			} else if (key.endsWith("_max")) {
@@ -245,10 +247,9 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 					return false;
 				}
 				String id = key.replace("ie_action_", "").replace("_max", "");
+				md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				if (id.equals("31")) {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
-				} else {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and min=0 and step=" + step);
 				}
 				arg0.setSummary(arg1.toString());
 			} else if (key.endsWith("_fanx")) {
@@ -257,13 +258,13 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 				}
 				if (Integer.parseInt(arg1.toString()) == 1) {
 					fanx = 1;
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max < 0 and step=" + step);
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min < 0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max < 0 and min=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min < 0 and max=0 and step=" + step);
 					arg0.setSummary("向右");
 				} else {
 					fanx = -1;
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max > 0 and step=" + step);
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min > 0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max > 0 and min=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min > 0 and max=0 and step=" + step);
 					arg0.setSummary("向左");
 				}
 			} else {

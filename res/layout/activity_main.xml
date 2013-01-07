@@ -28,28 +28,6 @@
   	</LinearLayout>
   	
 	<LinearLayout
-	    android:id="@+id/laySystem"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_gravity="center"
-	    android:layout_marginTop="10dp"
-	    android:background="@drawable/button_checked_bg"
-	    android:clickable="true"
-	    android:gravity="center"
-	    android:padding="10dp" >
-
-      <TextView
-          android:id="@+id/textView3"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:text="系统设置"
-          android:textAppearance="?android:attr/textAppearanceMedium"
-          android:textColor="@color/card_text" />
-
-  	</LinearLayout>
-  	
-	<LinearLayout
 	    android:id="@+id/layRoute"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -66,6 +44,28 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center"
           android:text="路线设置"
+          android:textAppearance="?android:attr/textAppearanceMedium"
+          android:textColor="@color/card_text" />
+
+  	</LinearLayout>
+  	
+	<LinearLayout
+	    android:id="@+id/laySystem"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center"
+	    android:layout_marginTop="10dp"
+	    android:background="@drawable/button_checked_bg"
+	    android:clickable="true"
+	    android:gravity="center"
+	    android:padding="10dp" >
+
+      <TextView
+          android:id="@+id/textView3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:text="系统设置"
           android:textAppearance="?android:attr/textAppearanceMedium"
           android:textColor="@color/card_text" />
 

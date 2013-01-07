@@ -4,11 +4,11 @@
     <EditTextPreference android:title="语音提示" android:key="ie_tts"/>
     <EditTextPreference android:title="时长" android:key="ie_timeout"/>
     <PreferenceCategory android:title="要求的条件" android:key="ie_actions">
-        <CheckBoxPreference android:key="ie_action_20" android:title="速度"/>
+        <CheckBoxPreference android:key="ie_action_20" android:title="转速"/>
         <EditTextPreference android:title="最小值" android:key="ie_action_20_min" android:dependency="ie_action_20"/>
         <EditTextPreference android:title="最大值" android:key="ie_action_20_max" android:dependency="ie_action_20"/>
         <ListPreference android:title="扣分项" android:key="ie_action_20_err" android:dependency="ie_action_20"/>
-        <CheckBoxPreference android:key="ie_action_21" android:title="转速"/>
+        <CheckBoxPreference android:key="ie_action_21" android:title="速度"/>
         <EditTextPreference android:title="最小值" android:key="ie_action_21_min" android:dependency="ie_action_21"/>
         <EditTextPreference android:title="最大值" android:key="ie_action_21_max" android:dependency="ie_action_21"/>
         <ListPreference android:title="扣分项" android:key="ie_action_21_err" android:dependency="ie_action_21"/>

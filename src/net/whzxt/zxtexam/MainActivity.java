@@ -25,6 +25,7 @@ import android.os.Message;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
@@ -102,6 +103,24 @@ public class MainActivity extends Activity {
 				startActivity(new Intent().setClass(MainActivity.this, DetectActivity.class));
 			}
 		});
+		if (md.getDataResourceType() == -1) {
+			AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请选择设备类型").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("串口", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {						
+					md.setDataResourceType(0);
+				}
+			}).setNegativeButton("蓝牙", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
+					if (mAdapter == null) {
+						md.setDataResourceType(0);
+						Toast.makeText(MainActivity.this, "此设备不支持蓝牙", Toast.LENGTH_SHORT).show();						
+						return;
+					}
+					md.setDataResourceType(1);
+				}
+			}).create();
+			alertDialog.show();
+		}
 		// 检查更新
 		new AsyncTask<Void, Void, Integer>() {
 			@Override
@@ -183,7 +202,6 @@ public class MainActivity extends Activity {
 						_downLoadFile.delete();
 					}
 					_downLoadFile.createNewFile();
-					@SuppressWarnings("resource")
 					OutputStream outputStream = new FileOutputStream(_downLoadFile);
 					_fileLength = connection.getContentLength();
 					handler.sendEmptyMessage(H_W_UPDATEDIALOG_MAX);

@@ -11,6 +11,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,6 +29,7 @@ public class DetectActivity extends SerialPortActivity {
 	private LocationManager locationManager;
 	private String data;
 	private byte[] mBuffer;
+	private WakeLock wakeLock;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -51,14 +54,12 @@ public class DetectActivity extends SerialPortActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detect);
-		mBuffer = new byte[7];
-		mBuffer[0] = 0x1A;
-		mBuffer[1] = 0x01;
-		mBuffer[2] = 0x00;
-		mBuffer[3] = 0x00;
-		mBuffer[4] = 0x00;
-		mBuffer[5] = 0x00;
-		mBuffer[6] = 0x1D;
+
+		// 控制屏幕长亮
+		PowerManager manager = ((PowerManager) getSystemService(POWER_SERVICE));
+		wakeLock = manager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "ATAAW");
+		wakeLock.acquire();
+		
 		txtReception = (EditText) findViewById(R.id.txtReception);
 		textView0 = (TextView) findViewById(R.id.textView0);
 		textView1 = (TextView) findViewById(R.id.textView1);
@@ -120,20 +121,32 @@ public class DetectActivity extends SerialPortActivity {
 		textView30.setBackgroundResource(R.color.lightoff);
 		textView31.setBackgroundResource(R.color.lightoff);
 		textView32.setBackgroundResource(R.color.lightoff);
-		_timer = new Timer();
-		_timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (!readFlag) {
-					readFlag = !readFlag;
-					writeSerial();
-					readFlag = !readFlag;
+		mBuffer = new byte[7];
+		mBuffer[0] = 0x1A;
+		mBuffer[1] = 0x01;
+		mBuffer[2] = 0x00;
+		mBuffer[3] = 0x00;
+		mBuffer[4] = 0x00;
+		mBuffer[5] = 0x00;
+		mBuffer[6] = 0x1D;
+		if (_timer == null) {
+			_timer = new Timer();
+			_timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					if (!readFlag) {
+						readFlag = !readFlag;
+						writeSerial();
+						readFlag = !readFlag;
+					}
 				}
-			}
-		}, 50, 50);
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, locationListener);
-		changeGPS();
+			}, 100, 100);
+		}
+		if (locationManager == null) {
+			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, locationListener);
+			changeGPS();
+		}
 	}
 
 	private void writeSerial() {
@@ -275,9 +288,14 @@ public class DetectActivity extends SerialPortActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			_timer.cancel();
+			destroy();
 			DetectActivity.this.finish();
 		}
 		return false;
+	}
+
+	@Override
+	protected void destroy() {
+		_timer.cancel();
 	}
 }

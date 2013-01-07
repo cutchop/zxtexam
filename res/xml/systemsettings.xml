@@ -33,7 +33,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="GPS设置">
         <EditTextPreference android:title="阈值：0" android:key="range" android:summary="设置路线中自动触发考试项目的范围（单位：米）" android:dialogTitle="阈值"/>
-        <CheckBoxPreference android:title="GPS速度单位为海里" android:summary="默认为公里，勾选此项将单位设置为海里" android:key="haili" android:defaultValue="false"/>
+        <EditTextPreference android:title="GPS速度修正系数" android:summary="点击设置GPS速度修正系数" android:key="gpsspeedxs"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="串口设置">    
 		<ListPreference android:key="device" android:title="串口" android:persistent="true"></ListPreference>
