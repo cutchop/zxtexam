@@ -20,11 +20,34 @@ public abstract class BaseAction {
 		this._max = max;
 		this._min = min;
 	}
+	
+	
+	/*
+	 * 是否必须要通过
+	 */
+	public Boolean IsMustOK(int step) {
+		if (step != Step) {
+			return false;
+		}
+		if (_dataid < 20) {
+			if (Math.abs(_times) > 1) {
+				return true;
+			}
+		} else {
+			if (Math.abs(_min) > 0 && Math.abs(_max) == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/*
 	 * 是否需要等待超时
 	 */
-	public Boolean IsWaitTimeout() {
+	public Boolean IsWaitTimeout(int step) {
+		if (step != Step) {
+			return false;
+		}
 		if (_dataid < 20) {
 			if (Math.abs(_times) == 1) {
 				return true;

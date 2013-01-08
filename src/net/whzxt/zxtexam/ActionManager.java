@@ -72,7 +72,7 @@ public class ActionManager {
 						if (_timeout == 0) {
 							List<Integer> list = null;
 							for (int i = 0; i < _listActions.size(); i++) {
-								if (!_listActions.get(i).IsWaitTimeout()) {
+								if (_listActions.get(i).IsMustOK(_step)) {
 									if (!_listActions.get(i).CheckOK(_step)) {
 										if (list == null) {
 											list = new ArrayList<Integer>();
@@ -108,7 +108,7 @@ public class ActionManager {
 							if (!b) {
 								_step--;
 								for (int i = 0; i < _listActions.size(); i++) {
-									if (_listActions.get(i).IsWaitTimeout()) {
+									if (_listActions.get(i).IsWaitTimeout(_step)) {
 										b = true;
 									}
 								}

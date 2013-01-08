@@ -34,6 +34,7 @@
     <PreferenceCategory android:title="GPS设置">
         <EditTextPreference android:title="阈值：0" android:key="range" android:summary="设置路线中自动触发考试项目的范围（单位：米）" android:dialogTitle="阈值"/>
         <EditTextPreference android:title="GPS速度修正系数" android:summary="点击设置GPS速度修正系数" android:key="gpsspeedxs"/>
+        <CheckBoxPreference android:defaultValue="false" android:summary="没有速度脉冲数据时，勾选此项使用GPS速度评判" android:title="使用GPS速度" android:key="usegpsspeed"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="串口设置">    
 		<ListPreference android:key="device" android:title="串口" android:persistent="true"></ListPreference>

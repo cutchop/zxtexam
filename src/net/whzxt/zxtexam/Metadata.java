@@ -32,11 +32,9 @@ public class Metadata extends Application {
 	private static final String DEF_SERIAL = "/dev/ttyS1";
 	private static final String DEF_BAUDRATE = "115200";
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
+
 	public static final int PERIOD = 100;// 100毫秒评判一次
-
-	private static float NMDIVIDED = 1.852f; // 海里换算成公里
-
-	private static final int DBVERSION = 26;
+	private static final int DBVERSION = 28;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -89,8 +87,14 @@ public class Metadata extends Application {
 			data_Xinhao.put(id, val);
 			return;
 		}
-		if (id < 30) {
+		if (id == 20) {
 			data_Maichong.put(id, val);
+			return;
+		}
+		if (id == 21) {
+			if (!settings.getBoolean("usegpsspeed", false)) {
+				data_Maichong.put(id, val);
+			}
 			return;
 		}
 		if (id == 30) {
@@ -103,11 +107,15 @@ public class Metadata extends Application {
 	}
 
 	public int setGPSSpeed(float f) {
-		gpsspeed = Math.round(f * Float.parseFloat(settings.getString("gpsspeedxs", "1")) * 60 * 60 / 1000);
-		if (gpsspeed > 0 && getData(21) == 0) {
-			setData(21, gpsspeed);
+		gpsspeed = Math.round(f * getGpsSpeedXS() * 60 * 60 / 1000);
+		if (settings.getBoolean("usegpsspeed", false)) {
+			data_Maichong.put(21, gpsspeed);
 		}
 		return gpsspeed;
+	}
+
+	public float getGpsSpeedXS() {
+		return Float.parseFloat(settings.getString("gpsspeedxs", "1"));
 	}
 
 	public void setGPSLatlon(float lat, float lon) {

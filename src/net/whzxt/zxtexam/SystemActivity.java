@@ -23,7 +23,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.systemsettings);
+		addPreferencesFromResource(R.xml.systemsettings);		
 		md = (Metadata) getApplicationContext();
 		Preference preference = null;
 		// 信号和脉冲名称
@@ -60,10 +60,9 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		}
 		// GPS速度修正系数
 		preference = findPreference("gpsspeedxs");
-		if (preference != null) {
-			((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			preference.setOnPreferenceChangeListener(this);
-		}
+		preference.setTitle("GPS速度修正系数：" + md.getGpsSpeedXS());
+		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		preference.setOnPreferenceChangeListener(this);
 		// GPS阈值
 		preference = findPreference("range");
 		preference.setTitle("阈值：" + md.getRange());
