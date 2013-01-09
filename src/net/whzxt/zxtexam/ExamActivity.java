@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,7 +53,6 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Date start;
 	private TextView txtRouteName, txtTime, txtDefen;
 	private Button btnRgpp, btnStop;
-	private TextToSpeech mTts;
 	private static final int REQ_TTS_STATUS_CHECK = 0;
 	private LocationManager locationManager;
 	private byte[] mBuffer;
@@ -60,9 +60,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private ActionManager actionManager;
 	private Boolean isAuto = false;
 	private Boolean needCheckLight = false;
+	private Boolean needCheckDevice = false;
 	private Boolean islatlonMatched = false;
 	private Boolean isMatching = false;
 	private WakeLock wakeLock;
+	private final int DL_SEARCHING = 0x01;
+	private final int DL_CONNECTING = 0x02;
+	private final int DL_CHECKDEVICESTATUS = 0x03;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -112,17 +116,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					}
 				}
 			});
-			if (itemList.size() > 0) {
-				if (Integer.parseInt(itemList.get(0).get("type").toString()) == 1) {
-					if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1 || md.getData(3) == 1 || md.getData(4) == 1 || md.getData(6) == 1 || md.getData(9) == 1) {
-						needCheckLight = true;
-						speak("请关闭所有灯光,准备考试");
-					} else {
-						speak(routeTts, -1);
-					}
-				} else {
-					speak(routeTts);
+			if (isDeviceOK) {
+				loadInit();
+			} else {
+				if (md.getDataResourceType() == 0) {
+					showDialog(DL_CHECKDEVICESTATUS);
 				}
+				needCheckDevice = true;
 			}
 		}
 	}
@@ -140,6 +140,21 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		txtDefen.setText(String.valueOf(fenshu));
 	}
 
+	private void loadInit() {
+		if (itemList.size() > 0) {
+			if (Integer.parseInt(itemList.get(0).get("type").toString()) == 1) {
+				if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1 || md.getData(3) == 1 || md.getData(4) == 1 || md.getData(6) == 1 || md.getData(9) == 1) {
+					needCheckLight = true;
+					speak("请关闭所有灯光,准备考试");
+				} else {
+					speak(routeTts, -1);
+				}
+			} else {
+				speak(routeTts);
+			}
+		}
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -149,7 +164,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		PowerManager manager = ((PowerManager) getSystemService(POWER_SERVICE));
 		wakeLock = manager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "ATAAW");
 		wakeLock.acquire();
-		
+
 		start = new Date();
 		txtRouteName = (TextView) findViewById(R.id.txtRouteName);
 		txtTime = (TextView) findViewById(R.id.txtTime);
@@ -382,6 +397,20 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				@Override
 				public void run() {
 					handler.sendEmptyMessage(-1);
+					// 检查设备是否就绪
+					if (needCheckDevice) {
+						if (isDeviceOK) {
+							needCheckDevice = false;
+							runOnUiThread(new Runnable() {
+								public void run() {
+									if (md.getDataResourceType() == 0) {
+										dismissDialog(DL_CHECKDEVICESTATUS);
+									}
+									loadInit();
+								}
+							});
+						}
+					}
 					// 灯光考试时检查是否已经关闭所有灯光，然后开始考试
 					if (needCheckLight) {
 						if (md.getData(0) == 0 && md.getData(1) == 0 && md.getData(2) == 0 && md.getData(3) == 0 && md.getData(4) == 0 && md.getData(6) == 0 && md.getData(9) == 0) {
@@ -573,6 +602,25 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				md.setData(21, Integer.parseInt(data.substring(18, 20) + data.substring(16, 18), 16));
 			}
 		}
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args) {
+		AlertDialog dialog = null;
+		switch (id) {
+		case DL_SEARCHING:
+			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在搜索无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			break;
+		case DL_CONNECTING:
+			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在连接无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			break;
+		case DL_CHECKDEVICESTATUS:
+			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在检测设备,请稍候...").setIcon(android.R.drawable.ic_dialog_info).create();
+			break;
+		default:
+			return null;
+		}
+		return dialog;
 	}
 
 	@Override

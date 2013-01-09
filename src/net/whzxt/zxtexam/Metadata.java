@@ -34,7 +34,7 @@ public class Metadata extends Application {
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 28;
+	private static final int DBVERSION = 29;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;

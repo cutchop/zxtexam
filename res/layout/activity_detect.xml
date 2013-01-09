@@ -314,7 +314,7 @@
                     android:layout_height="fill_parent"
                     android:layout_weight="1"
                     android:gravity="top"
-                    android:hint="串口(蓝牙)消息"
+                    android:hint="串口(无线)消息"
                     android:isScrollContainer="true"
                     android:scrollbarStyle="insideOverlay" >
 

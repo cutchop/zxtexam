@@ -53,7 +53,7 @@
             <ListView
                 android:id="@+id/listView1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent" android:background="#BDC5D6">
 
             </ListView>
 
@@ -132,7 +132,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.5" >
+        android:layout_weight="0.5" android:background="@drawable/exambuttom">
 
         <GridView
             android:id="@+id/gridView1"
@@ -141,15 +141,15 @@
             android:layout_weight="0.4"
             android:horizontalSpacing="2dp"
             android:numColumns="3"
-            android:verticalSpacing="2dp" >
+            android:verticalSpacing="2dp" android:background="@android:color/transparent" android:paddingRight="10dp">
 
         </GridView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.6"
-            android:orientation="vertical" >
+            android:layout_weight="0.7"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -167,7 +167,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="0.5"
                     android:text="人工评判"
-                    android:textSize="20sp" />
+                    android:textSize="20sp" android:background="@drawable/exambutton" android:textColor="#fff"/>
 
                 <Button
                     android:id="@+id/btnStop"
@@ -179,7 +179,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_weight="0.5"
                     android:text="结束考试"
-                    android:textSize="20sp" />
+                    android:textSize="20sp" android:textColor="#fff" android:background="@drawable/exambutton"/>
 
             </LinearLayout>
 
@@ -190,7 +190,7 @@
                 android:layout_weight="0.7"
                 android:gravity="left|center"
                 android:paddingLeft="5dp"
-                android:text="lnglat:0,0;speed:0;" />
+                android:text="lnglat:0,0;speed:0;" android:textColor="#111"/>
 
         </LinearLayout>
 

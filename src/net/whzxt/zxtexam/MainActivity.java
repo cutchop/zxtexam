@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -16,34 +17,43 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
 	private LinearLayout layStart, laySystem, layRoute, layDetect;
+	private TextView txtVersionName;
 	private String strResult;
 	private ProgressDialog _updateDialog;
 	private File _downLoadFile;
 	private int _fileLength, _downedFileLength = 0;
 	private static final int H_W_UPDATEDIALOG_MAX = 0x01;
 	private static final int H_W_UPDATEDIALOG_NOW = 0x02;
+	private static final int OPEN_GPS = 0x09;
 	private Metadata md;
+	private LocationManager locationManager;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -68,19 +78,47 @@ public class MainActivity extends Activity {
 		laySystem = (LinearLayout) findViewById(R.id.laySystem);
 		layRoute = (LinearLayout) findViewById(R.id.layRoute);
 		layDetect = (LinearLayout) findViewById(R.id.layDetect);
-		md = (Metadata)getApplication();
+		txtVersionName = (TextView) findViewById(R.id.txtVersionName);
+		md = (Metadata) getApplication();
 		layStart.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				startActivity(new Intent().setClass(MainActivity.this, ChooseActivity.class));
 			}
 		});
+
+		txtVersionName.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				final EditText txtpsd = new EditText(MainActivity.this);
+				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请输入密码").setIcon(android.R.drawable.ic_menu_help).setView(txtpsd).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						int psd = 0;
+						try {
+							psd = Integer.parseInt(txtpsd.getText().toString());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						if (psd == new Date().getDate() * new Date().getDay()) {
+							startActivity(new Intent().setClass(MainActivity.this, SystemActivity.class));
+						} else {
+							Toast.makeText(MainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
+						}
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
+				alertDialog.show();
+			}
+		});
+
 		laySystem.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				final EditText txtpsd = new EditText(MainActivity.this);
 				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请输入密码").setIcon(android.R.drawable.ic_menu_help).setView(txtpsd).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {						
+					public void onClick(DialogInterface dialog, int which) {
 						if (txtpsd.getText().toString().toLowerCase().equals(md.getPassword().toLowerCase())) {
-							startActivity(new Intent().setClass(MainActivity.this, SystemActivity.class));
+							startActivity(new Intent().setClass(MainActivity.this, ArgsSettingsActivity.class));
 						} else {
 							Toast.makeText(MainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
 						}
@@ -95,7 +133,21 @@ public class MainActivity extends Activity {
 		});
 		layRoute.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				startActivity(new Intent().setClass(MainActivity.this, RouteActivity.class));
+				final EditText txtpsd = new EditText(MainActivity.this);
+				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请输入密码").setIcon(android.R.drawable.ic_menu_help).setView(txtpsd).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						if (txtpsd.getText().toString().toLowerCase().equals(md.getPassword().toLowerCase())) {
+							startActivity(new Intent().setClass(MainActivity.this, RouteActivity.class));
+						} else {
+							Toast.makeText(MainActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
+						}
+					}
+				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
+				alertDialog.show();
 			}
 		});
 		layDetect.setOnClickListener(new OnClickListener() {
@@ -103,20 +155,32 @@ public class MainActivity extends Activity {
 				startActivity(new Intent().setClass(MainActivity.this, DetectActivity.class));
 			}
 		});
+		// 选择设备类型
 		if (md.getDataResourceType() == -1) {
 			AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("请选择设备类型").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("串口", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {						
+				public void onClick(DialogInterface dialog, int which) {
 					md.setDataResourceType(0);
 				}
-			}).setNegativeButton("蓝牙", new DialogInterface.OnClickListener() {
+			}).setNegativeButton("无线", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
 					if (mAdapter == null) {
 						md.setDataResourceType(0);
-						Toast.makeText(MainActivity.this, "此设备不支持蓝牙", Toast.LENGTH_SHORT).show();						
+						Toast.makeText(MainActivity.this, "此设备不支持无线", Toast.LENGTH_SHORT).show();
 						return;
 					}
 					md.setDataResourceType(1);
+				}
+			}).create();
+			alertDialog.show();
+		}
+		// 打开GPS
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+		if (!locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+			AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("需要打开GPS").setMessage("请点击设置，然后勾选\"使用GPS卫星\"").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("设置", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					startActivityForResult((new Intent(Settings.ACTION_SECURITY_SETTINGS)), OPEN_GPS);
 				}
 			}).create();
 			alertDialog.show();
@@ -177,6 +241,42 @@ public class MainActivity extends Activity {
 			}
 		}.execute();
 	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == OPEN_GPS) {
+			if (!locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setTitle("需要打开GPS").setMessage("请点击设置，然后勾选\"使用GPS卫星\"").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("设置", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						MainActivity.this.startActivityForResult((new Intent(Settings.ACTION_SECURITY_SETTINGS)), OPEN_GPS);
+					}
+				}).create();
+				alertDialog.show();
+			}
+		}
+	}
+
+	private final LocationListener locationListener = new LocationListener() {
+		public void onLocationChanged(Location location) {
+			if (location != null) {
+			}
+		}
+
+		public void onProviderDisabled(String provider) {
+			// TODO Auto-generated method stub
+
+		}
+
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+
+		}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+
+		}
+	};
 
 	private void newversion() {
 		_updateDialog = new ProgressDialog(MainActivity.this);

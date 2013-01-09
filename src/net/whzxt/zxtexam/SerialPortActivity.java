@@ -23,6 +23,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android_serialport_api.SerialPort;
 
@@ -39,6 +40,8 @@ public abstract class SerialPortActivity extends Activity {
 	private final int DL_CONNECTING = 0x02;
 	private final UUID BLUEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	private List<BluetoothDevice> listBlue;
+	protected Boolean isDeviceOK = false;
+	protected TextToSpeech mTts;
 
 	private class ReadThread extends Thread {
 		@Override
@@ -76,8 +79,13 @@ public abstract class SerialPortActivity extends Activity {
 								break;
 							}
 						}
-						onDataReceived(buffer, tsize);
-						tsize = 0;
+						if (buffer[tsize-1] == 0x1D) {
+							if (!isDeviceOK) {
+								isDeviceOK = true;	
+							}
+							onDataReceived(buffer, tsize);
+							tsize = 0;
+						}
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -88,19 +96,13 @@ public abstract class SerialPortActivity extends Activity {
 	}
 
 	private void DisplayError(int resourceId) {
-		AlertDialog.Builder b = new AlertDialog.Builder(this);
-		b.setTitle("错误");
-		b.setMessage(resourceId);
-		b.setPositiveButton("关闭", new OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				destroy();
-				SerialPortActivity.this.finish();
-			}
-		});
-		b.show();
+		DisplayError(getString(resourceId));
 	}
 
 	private void DisplayError(String msg) {
+		if (mTts != null) {
+			mTts.speak(msg, TextToSpeech.QUEUE_FLUSH, null);
+		}
 		AlertDialog.Builder b = new AlertDialog.Builder(this);
 		b.setTitle("错误");
 		b.setMessage(msg);
@@ -187,7 +189,7 @@ public abstract class SerialPortActivity extends Activity {
 					for (int i = 0; i < listBlue.size(); i++) {
 						names[i] = listBlue.get(i).getName();
 					}
-					AlertDialog alertDialog = new AlertDialog.Builder(SerialPortActivity.this).setTitle("请选择要连接的蓝牙设备").setIcon(android.R.drawable.ic_menu_add).setItems(names, new DialogInterface.OnClickListener() {
+					AlertDialog alertDialog = new AlertDialog.Builder(SerialPortActivity.this).setTitle("请选择要连接的设备").setIcon(android.R.drawable.ic_menu_add).setItems(names, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							try {
 								if (listBlue.get(which).getBondState() == BluetoothDevice.BOND_NONE) {
@@ -199,13 +201,13 @@ public abstract class SerialPortActivity extends Activity {
 									_clientThread.start();
 								}
 							} catch (Exception e) {
-								DisplayError("蓝牙无法配对");
+								DisplayError("设备无法配对");
 								e.printStackTrace();
 							}
 						}
 					}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							DisplayError("蓝牙连接失败");
+							DisplayError("无线设备连接失败");
 						}
 					}).create();
 					alertDialog.show();
@@ -249,7 +251,7 @@ public abstract class SerialPortActivity extends Activity {
 					runOnUiThread(new Runnable() {
 						public void run() {
 							dismissDialog(DL_CONNECTING);
-							DisplayError("与蓝牙设备" + mBlueDevice.getName() + "连接失败");
+							DisplayError("与无线设备" + mBlueDevice.getName() + "连接失败");
 						}
 					});
 					e.printStackTrace();
@@ -263,10 +265,10 @@ public abstract class SerialPortActivity extends Activity {
 		AlertDialog dialog = null;
 		switch (id) {
 		case DL_SEARCHING:
-			dialog = new AlertDialog.Builder(SerialPortActivity.this).setCancelable(false).setMessage("正在搜索蓝牙设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			dialog = new AlertDialog.Builder(SerialPortActivity.this).setCancelable(false).setMessage("正在搜索无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
 			break;
 		case DL_CONNECTING:
-			dialog = new AlertDialog.Builder(SerialPortActivity.this).setCancelable(false).setMessage("正在连接蓝牙设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			dialog = new AlertDialog.Builder(SerialPortActivity.this).setCancelable(false).setMessage("正在连接无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
 			break;
 		default:
 			return null;

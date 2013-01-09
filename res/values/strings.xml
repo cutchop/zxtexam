@@ -1,11 +1,16 @@
 <resources>
 
-    <string name="app_name">模拟考试</string>
-    <string name="version">1.9</string>
+    <string name="app_name">练车宝</string>
+    <string name="version">2.1</string>
     <string name="server">http://221.232.160.197</string>
     <string name="error_configuration">请先设置串口.</string>
     <string name="error_security">您没有权限读写这个串口.</string>
     <string name="error_unknown">串口打开失败.</string>
-    <string name="error_unfind">没有搜索到蓝牙设备.</string>
-
+    <string name="error_unfind">没有搜索到无线设备.</string>
+	<string name="welcome1">欢迎使用</string>
+	<string name="welcome2">“练车宝” 之</string>
+	<string name="welcome3">驾驶人科目三路考智能训练系统</string>
+	<string name="welcome4">长科院仪器自动化研究所、武汉汇锦联合研制</string>
+	<string name="welcome5">服务电话：13971093266 QQ:76598325</string>	
+	
 </resources>

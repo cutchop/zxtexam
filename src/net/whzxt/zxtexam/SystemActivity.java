@@ -82,7 +82,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		baudrates.setOnPreferenceChangeListener(this);
 		// 数据来源
 		preference = findPreference("dataresourcetype");
-		preference.setSummary(md.getDataResourceType() == 0 ? "串口" : "蓝牙");
+		preference.setSummary(md.getDataResourceType() == 0 ? "串口" : "无线");
 		preference.setOnPreferenceChangeListener(this);
 	}
 
@@ -128,7 +128,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		} else if (preference.getKey().equals("baudrate")) {
 			preference.setSummary((String) newValue);
 		} else if (preference.getKey().equals("dataresourcetype")) {
-			preference.setSummary(newValue.toString().equals("0") ? "串口" : "蓝牙");
+			preference.setSummary(newValue.toString().equals("0") ? "串口" : "无线");
 		}
 		return true;
 	}

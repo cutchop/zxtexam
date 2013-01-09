@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="系统设置">
+        <ListPreference android:entries="@array/resources_name" android:entryValues="@array/resources_value" android:key="dataresourcetype" android:persistent="true" android:title="数据来源"></ListPreference>
+	    <EditTextPreference android:title="密码设置" android:summary="点击修改管理员密码" android:key="password"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="脉冲设置">
+        <EditTextPreference android:title="脉冲1修正系数" android:summary="点击设置脉冲1修正系数" android:key="maichongxs1"/>
+        <EditTextPreference android:title="脉冲2修正系数" android:summary="点击设置脉冲2修正系数" android:key="maichongxs2"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="GPS设置">
+        <EditTextPreference android:title="阈值：0" android:key="range" android:summary="设置路线中自动触发考试项目的范围（单位：米）" android:dialogTitle="阈值"/>
+        <EditTextPreference android:title="GPS速度修正系数" android:summary="点击设置GPS速度修正系数" android:key="gpsspeedxs"/>
+        <CheckBoxPreference android:defaultValue="false" android:summary="没有速度脉冲数据时，勾选此项使用GPS速度评判" android:title="使用GPS速度" android:key="usegpsspeed"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="串口设置">    
+		<ListPreference android:key="device" android:title="串口" android:persistent="true"></ListPreference>
+		<ListPreference android:entries="@array/baudrates_name" android:entryValues="@array/baudrates_value" android:key="baudrate" android:persistent="true" android:title="波特率"></ListPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -226,7 +226,7 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO zxt_item_err(errid, itemid, name, fenshu) VALUES (178,8,'下车后不关车门(关门)',10)");
 		db.execSQL("INSERT INTO zxt_item_err(errid, itemid, name, fenshu) VALUES (179,8,'下车前不将发动机熄火(点火信号)',5)");
 		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (0,'随机路线(手动)','当前为随机路线,请点击考试项目开始考试',0)");
-		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (1,'模拟夜间灯光考试(手动)','下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作',0)");
+		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (1,'模拟夜间灯光考试(手动)','下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作。请点击考试项目。',0)");
 		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (2,'模拟夜间灯光考试一(自动)','下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作',1)");
 		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (3,'模拟夜间灯光考试二(自动)','下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作',1)");
 		db.execSQL("INSERT INTO zxt_route(routeid, name, tts, auto) VALUES (4,'模拟夜间灯光考试三(自动)','下面将、进行模拟夜间行驶场景灯光、使用的考试，请按语音指令、在5秒内做出相应的灯光操作',1)");

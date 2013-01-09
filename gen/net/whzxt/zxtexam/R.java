@@ -45,16 +45,22 @@ public final class R {
     public static final class drawable {
         public static final int button_checked_bg=0x7f020000;
         public static final int del=0x7f020001;
-        public static final int ic_action_search=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
-        public static final int title_bg=0x7f020004;
-        public static final int titlebg=0x7f020005;
+        public static final int exambuttom=0x7f020002;
+        public static final int exambutton=0x7f020003;
+        public static final int examgridbutton=0x7f020004;
+        public static final int ic_action_search=0x7f020005;
+        public static final int ic_launcher=0x7f020006;
+        public static final int mainbg=0x7f020007;
+        public static final int mainbutton=0x7f020008;
+        public static final int title_bg=0x7f020009;
+        public static final int titlebg=0x7f02000a;
+        public static final int welcomebg=0x7f02000b;
     }
     public static final class id {
-        public static final int btnName=0x7f0a0028;
+        public static final int btnName=0x7f0a0029;
         public static final int btnRgpp=0x7f0a0020;
         public static final int btnStop=0x7f0a0021;
-        public static final int btnTts=0x7f0a002a;
+        public static final int btnTts=0x7f0a002b;
         public static final int gridView1=0x7f0a001f;
         public static final int layDefen=0x7f0a001b;
         public static final int layDetect=0x7f0a0026;
@@ -62,9 +68,9 @@ public final class R {
         public static final int layStart=0x7f0a0023;
         public static final int laySystem=0x7f0a0025;
         public static final int listView1=0x7f0a0001;
-        public static final int radAutoFalse=0x7f0a002d;
-        public static final int radAutoTrue=0x7f0a002c;
-        public static final int radioGroup1=0x7f0a002b;
+        public static final int radAutoFalse=0x7f0a002e;
+        public static final int radAutoTrue=0x7f0a002d;
+        public static final int radioGroup1=0x7f0a002c;
         public static final int tableRow1=0x7f0a0002;
         public static final int tableRow2=0x7f0a0006;
         public static final int tableRow3=0x7f0a000b;
@@ -91,12 +97,13 @@ public final class R {
         public static final int textView8=0x7f0a000c;
         public static final int textView9=0x7f0a000d;
         public static final int txtDefen=0x7f0a001d;
-        public static final int txtName=0x7f0a0027;
+        public static final int txtName=0x7f0a0028;
         public static final int txtReception=0x7f0a001a;
         public static final int txtRouteName=0x7f0a001e;
         public static final int txtStatus=0x7f0a0022;
         public static final int txtTime=0x7f0a001c;
-        public static final int txtTts=0x7f0a0029;
+        public static final int txtTts=0x7f0a002a;
+        public static final int txtVersionName=0x7f0a0027;
     }
     public static final class layout {
         public static final int activity_choose=0x7f030000;
@@ -106,8 +113,9 @@ public final class R {
         public static final int activity_main=0x7f030004;
         public static final int activity_route=0x7f030005;
         public static final int activity_route_edit=0x7f030006;
-        public static final int gridlayout=0x7f030007;
-        public static final int listlayout=0x7f030008;
+        public static final int activity_welcome=0x7f030007;
+        public static final int gridlayout=0x7f030008;
+        public static final int listlayout=0x7f030009;
     }
     public static final class string {
         public static final int app_name=0x7f080000;
@@ -117,14 +125,20 @@ public final class R {
         public static final int error_unknown=0x7f080005;
         public static final int server=0x7f080002;
         public static final int version=0x7f080001;
+        public static final int welcome1=0x7f080007;
+        public static final int welcome2=0x7f080008;
+        public static final int welcome3=0x7f080009;
+        public static final int welcome4=0x7f08000a;
+        public static final int welcome5=0x7f08000b;
     }
     public static final class style {
         public static final int AppTheme=0x7f090000;
     }
     public static final class xml {
-        public static final int itemedit=0x7f040000;
-        public static final int itemsettings=0x7f040001;
-        public static final int itemstep=0x7f040002;
-        public static final int systemsettings=0x7f040003;
+        public static final int argssettings=0x7f040000;
+        public static final int itemedit=0x7f040001;
+        public static final int itemsettings=0x7f040002;
+        public static final int itemstep=0x7f040003;
+        public static final int systemsettings=0x7f040004;
     }
 }
