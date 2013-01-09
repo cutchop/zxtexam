@@ -429,6 +429,10 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (8,31,0,3,0,175,1)");
 		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (8,12,2,0,0,178,6)");
 		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (8,8,-2,0,0,179,4)");
+		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (4,7,2,0,0,17,2)");
+		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (5,7,2,0,0,21,2)");
+		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (25,7,2,0,0,88,2)");
+		db.execSQL("INSERT INTO zxt_item_action(itemid,dataid,times,min,max,errid,step) VALUES (26,7,2,0,0,91,2)");
 
 	}
 

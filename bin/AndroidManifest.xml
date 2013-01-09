@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.whzxt.zxtexam"
     android:versionCode="1"
-    android:versionName="1.9" >
+    android:versionName="2.2" >
 
     <uses-sdk android:minSdkVersion="8" />
 
@@ -10,13 +10,14 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:name=".Metadata">
         <activity
-            android:name=".MainActivity" android:screenOrientation="landscape">
+            android:name=".WelcomeActivity" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".ChooseActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".ExamActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".RouteActivity" android:screenOrientation="landscape"></activity>
@@ -27,6 +28,7 @@
         <activity android:name=".ItemStepActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".ErrSettingsActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".DetectActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".ArgsSettingsActivity" android:screenOrientation="landscape"></activity>
     </application>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
