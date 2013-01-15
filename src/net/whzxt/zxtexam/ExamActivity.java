@@ -25,6 +25,9 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -45,6 +48,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private ListView listView;
 	private GridView gridView;
 	private TextView txtStatus;
+	private CheckBox cbHideAuto;
 	private ArrayList<HashMap<String, String>> errList;
 	private ArrayList<HashMap<String, Object>> itemList;
 	private Metadata md;
@@ -75,7 +79,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				refreshListView();
 			} else {
 				txtTime.setText("用时：" + getTimeDiff(start, new Date()));
-				txtStatus.setText("经纬度:" + md.getLatLonString() + " 角度:" + md.getData(31) + "\n" + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
+				txtStatus.setText("经纬度:" + md.getLatLonString() + " 角度:" + md.getData(31) + "\n" + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:"
+						+ md.get16DataString());
 			}
 		}
 	};
@@ -174,6 +179,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		btnRgpp = (Button) findViewById(R.id.btnRgpp);
 		btnStop = (Button) findViewById(R.id.btnStop);
 		txtStatus = (TextView) findViewById(R.id.txtStatus);
+		cbHideAuto = (CheckBox) findViewById(R.id.cbHideAuto);
 		md = (Metadata) getApplication();
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
@@ -238,7 +244,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,b.name as itemname,b.tts,b.timeout,b.type from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,b.name as itemname,b.tts,b.timeout,b.type from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM
+				+ " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		if (cursor.moveToFirst()) {
 			HashMap<String, Object> map = null;
 			do {
@@ -279,15 +286,16 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		// 扣分
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						delListItem(arg2);
-					}
-				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						return;
-					}
-				}).create();
+				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help)
+						.setPositiveButton("是", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								delListItem(arg2);
+							}
+						}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								return;
+							}
+						}).create();
 				alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
 					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
 						if (keyCode == KeyEvent.KEYCODE_HOME)
@@ -322,28 +330,29 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 								fenshus[k] = cursor.getString(cursor.getColumnIndex("fenshu"));
 								k++;
 							} while (cursor.moveToNext());
-							AlertDialog dialog2 = new AlertDialog.Builder(ExamActivity.this).setTitle("请选择扣分项").setIcon(android.R.drawable.ic_menu_add).setItems(strs2, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									HashMap<String, String> map = new HashMap<String, String>();
-									map.put("itemname", tmpitemname);
-									map.put("fenshu", fenshus[which]);
-									map.put("errname", errnames[which]);
-									errList.add(map);
-									fenshu -= Integer.parseInt(fenshus[which]);
-									if (fenshu < 0) {
-										fenshu = 0;
-									}
-									if (fenshu < 90) {
-										speak("考试不合格,扣分项目为," + strs2[which]);
-									}
-									listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList));
-									txtDefen.setText(String.valueOf(fenshu));
-								}
-							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									return;
-								}
-							}).create();
+							AlertDialog dialog2 = new AlertDialog.Builder(ExamActivity.this).setTitle("请选择扣分项").setIcon(android.R.drawable.ic_menu_add)
+									.setItems(strs2, new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											HashMap<String, String> map = new HashMap<String, String>();
+											map.put("itemname", tmpitemname);
+											map.put("fenshu", fenshus[which]);
+											map.put("errname", errnames[which]);
+											errList.add(map);
+											fenshu -= Integer.parseInt(fenshus[which]);
+											if (fenshu < 0) {
+												fenshu = 0;
+											}
+											if (fenshu < 90) {
+												speak("考试不合格,扣分项目为," + strs2[which]);
+											}
+											listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList));
+											txtDefen.setText(String.valueOf(fenshu));
+										}
+									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
 							dialog2.show();
 						} else {
 							Toast.makeText(ExamActivity.this, "该项目没有扣分项", Toast.LENGTH_SHORT).show();
@@ -362,6 +371,14 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			public void onClick(View v) {
 				destroy();
 				ExamActivity.this.finish();
+			}
+		});
+		// 隐藏自动触发的项目
+		cbHideAuto.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					
+				}
 			}
 		});
 
@@ -434,9 +451,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 		}
 	}
+	
 
 	private void execItem(int index) {
-		Cursor cursor = md.rawQuery("select a.*,b.name as errname,b.fenshu from " + DBer.T_ITEM_ACTION + " a left join " + DBer.T_ITEM_ERR + " b on a.errid=b.errid where a.itemid=" + itemList.get(index).get("itemid"));
+		Cursor cursor = md.rawQuery("select a.*,b.name as errname,b.fenshu from " + DBer.T_ITEM_ACTION + " a left join " + DBer.T_ITEM_ERR + " b on a.errid=b.errid where a.itemid="
+				+ itemList.get(index).get("itemid"));
 		if (cursor.moveToFirst()) {
 			List<BaseAction> list = new ArrayList<BaseAction>();
 			do {

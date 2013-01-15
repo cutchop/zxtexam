@@ -127,6 +127,13 @@
             android:text="考试项目列表：(随机路线)"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
+        <CheckBox
+            android:id="@+id/cbHideAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="隐藏自动触发的项目" />
+
     </LinearLayout>
 
     <LinearLayout
