@@ -208,9 +208,9 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
-					sBuffer.append(cursor.getInt(cursor.getColumnIndex("lon")));
+					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lon")));
 					sBuffer.append(",");
-					sBuffer.append(cursor.getInt(cursor.getColumnIndex("lat")));
+					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lat")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("xuhao")));
 					sBuffer.append(")\");\n");

@@ -1,7 +1,9 @@
 package net.whzxt.zxtexam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +20,8 @@ public class RouteActivity extends Activity {
 	private ListView listView;
 	private Metadata md;
 	private List<String> data;
+	private Map<Integer, Integer> mapRouteID;
+	private int i;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +30,7 @@ public class RouteActivity extends Activity {
 		listView = (ListView) findViewById(R.id.listView1);
 		md = (Metadata) getApplication();
 		data = new ArrayList<String>();
+		mapRouteID = new HashMap<Integer, Integer>();
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				Intent intent = new Intent();
@@ -33,7 +38,7 @@ public class RouteActivity extends Activity {
 				if (arg2 == data.size() - 1) {
 					bundle.putInt("routeid", -1);
 				} else {
-					bundle.putInt("routeid", arg2);
+					bundle.putInt("routeid", mapRouteID.get(arg2));
 				}
 				intent.putExtras(bundle);
 				intent.setClass(RouteActivity.this, RouteEditActivity.class);
@@ -45,10 +50,13 @@ public class RouteActivity extends Activity {
 
 	private void load() {
 		data.clear();
+		i = 0;
 		Cursor cursor = md.rawQuery("select routeid,name from " + DBer.T_ROUTE + " order by routeid");
 		if (cursor.moveToFirst()) {
 			do {
 				data.add(cursor.getString(cursor.getColumnIndex("name")));
+				mapRouteID.put(i, cursor.getInt(cursor.getColumnIndex("routeid")));
+				i++;
 			} while (cursor.moveToNext());
 		}
 		cursor.close();

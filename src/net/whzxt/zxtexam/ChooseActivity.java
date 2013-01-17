@@ -1,7 +1,9 @@
 package net.whzxt.zxtexam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,6 +27,7 @@ public class ChooseActivity extends Activity implements OnInitListener {
 	private ListView listView;
 	private Metadata md;
 	private List<String> data;
+	private Map<Integer, Integer> mapRouteID;
 	private LocationManager locationManager;
 	private double lat = 0f;
 	private TextToSpeech mTts;
@@ -64,10 +67,14 @@ public class ChooseActivity extends Activity implements OnInitListener {
 		listView = (ListView) findViewById(R.id.listView1);
 		md = (Metadata) getApplication();
 		data = new ArrayList<String>();
+		mapRouteID = new HashMap<Integer, Integer>();
+		int i = 0;
 		Cursor cursor = md.rawQuery("select routeid,name from " + DBer.T_ROUTE + " order by routeid");
 		if (cursor.moveToFirst()) {
 			do {
 				data.add(cursor.getString(cursor.getColumnIndex("name")));
+				mapRouteID.put(i, cursor.getInt(cursor.getColumnIndex("routeid")));
+				i++;
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
@@ -88,7 +95,7 @@ public class ChooseActivity extends Activity implements OnInitListener {
 				}
 				Intent intent = new Intent();
 				Bundle bundle = new Bundle();
-				bundle.putInt("routeid", arg2);
+				bundle.putInt("routeid", mapRouteID.get(arg2));
 				bundle.putString("routename", data.get(arg2));
 				intent.putExtras(bundle);
 				intent.setClass(ChooseActivity.this, ExamActivity.class);

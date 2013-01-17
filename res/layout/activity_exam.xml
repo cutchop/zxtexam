@@ -116,9 +116,7 @@
         android:background="@drawable/title_bg"
         android:gravity="center|left"
         android:orientation="horizontal"
-        android:paddingBottom="2dp"
-        android:paddingLeft="5dp"
-        android:paddingTop="2dp" >
+        android:paddingLeft="5dp" >
 
         <TextView
             android:id="@+id/txtRouteName"
@@ -133,6 +131,13 @@
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="隐藏自动触发的项目" />
+
+        <TextView
+            android:id="@+id/txtCurrentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
     </LinearLayout>
 

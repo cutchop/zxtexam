@@ -19,6 +19,11 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 		addPreferencesFromResource(R.xml.itemsettings);
 		itemcategory = (PreferenceCategory) findPreference("itemcategory");
 		md = (Metadata) getApplication();
+		load();
+	}
+
+	private void load() {
+		itemcategory.removeAll();
 		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
 		if (cursor.moveToFirst()) {
 			do {
@@ -31,6 +36,12 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
+		Preference preference = new Preference(this);
+		preference.setKey("item-1");
+		preference.setTitle("添加项目...");
+		preference.setSummary("点击这里将创建一个新项目");
+		preference.setOnPreferenceClickListener(this);
+		itemcategory.addPreference(preference);
 	}
 
 	public boolean onPreferenceClick(Preference preference) {
@@ -39,8 +50,18 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 		bundle.putInt("itemid", Integer.parseInt(preference.getKey().substring(4)));
 		intent.putExtras(bundle);
 		intent.setClass(ItemsActivity.this, ItemStepActivity.class);
-		startActivity(intent);
+		startActivityForResult(intent, 0);
 		return false;
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (resultCode) {
+		case RESULT_OK:
+			load();
+			break;
+		default:
+			break;
+		}
+	}
 }

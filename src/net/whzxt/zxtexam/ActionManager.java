@@ -73,7 +73,7 @@ public class ActionManager {
 							List<Integer> list = null;
 							for (int i = 0; i < _listActions.size(); i++) {
 								if (_listActions.get(i).IsMustOK(_step)) {
-									if (!_listActions.get(i).CheckOK(_step)) {
+									if (!_listActions.get(i).CheckOK(_step) && _listActions.get(i).Fenshu > 0) {
 										if (list == null) {
 											list = new ArrayList<Integer>();
 										}
@@ -121,7 +121,7 @@ public class ActionManager {
 						List<Integer> list = null;
 						for (int i = 0; i < _listActions.size(); i++) {
 							_listActions.get(i).CheckOK(_step);
-							if (_listActions.get(i).CheckError(_step)) {
+							if (_listActions.get(i).CheckError(_step) && _listActions.get(i).Fenshu > 0) {
 								if (list == null) {
 									list = new ArrayList<Integer>();
 								}

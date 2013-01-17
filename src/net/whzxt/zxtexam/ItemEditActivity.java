@@ -115,7 +115,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		((EditTextPreference) findPreference("ie_action_30_max")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_30_max").setOnPreferenceChangeListener(this);
 		findPreference("ie_action_31").setOnPreferenceChangeListener(this);
-		((EditTextPreference) findPreference("ie_action_31_min")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
+		//((EditTextPreference) findPreference("ie_action_31_min")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_31_min").setOnPreferenceChangeListener(this);
 		((EditTextPreference) findPreference("ie_action_31_max")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_31_max").setOnPreferenceChangeListener(this);
