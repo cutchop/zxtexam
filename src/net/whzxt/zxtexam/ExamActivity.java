@@ -67,8 +67,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Boolean isAuto = false;
 	private Boolean needCheckLight = false;
 	private Boolean needCheckDevice = false;
-	private Boolean islatlonMatched = false;
-	private Boolean isMatching = false;
+	private Boolean startMatch = false;
 	private Map<Integer, Integer> itemNoMap;
 	private WakeLock wakeLock;
 	private final int DL_SEARCHING = 0x01;
@@ -78,11 +77,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			if (msg.what == 1) {
-				refreshListView();
+			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout").toString()) == 0) {
+				speak(itemAllList.get(msg.what).get("tts").toString());
 			} else {
-				txtTime.setText("用时：" + getTimeDiff(start, new Date()));
-				txtStatus.setText("经纬度:" + md.getLatLonString() + " 角度:" + md.getData(31) + "\n" + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
+				currId = msg.what;
+				speak(itemAllList.get(msg.what).get("tts").toString(), msg.what);
 			}
 		}
 	};
@@ -102,22 +101,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 									}
 								}
 							});
-						} else {
-							if (Integer.parseInt(utteranceId) == -1) {
-								// 自动执行
-								runOnUiThread(new Runnable() {
-									public void run() {
-										try {
-											if (itemAllList.size() > 0 && isAuto) {
-												if (itemAllList.get(0).get("type").toString().equals("1")) {
-													speak(itemAllList.get(0).get("tts").toString(), 0);
-												}
-											}
-										} catch (NumberFormatException e) {
-											e.printStackTrace();
-										}
-									}
-								});
+						} else if (Integer.parseInt(utteranceId) == -1) {
+							// 自动执行
+							if (isAuto) {
+								if (itemAllList.get(0).get("type").toString().equals("1")) {
+									handler.sendEmptyMessage(0);
+								}
+								startMatch = true;
 							}
 						}
 					}
@@ -148,18 +138,14 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void loadInit() {
-		if (itemAllList.size() > 0) {
-			if (Integer.parseInt(itemAllList.get(0).get("type").toString()) == 1) {
-				if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1 || md.getData(3) == 1 || md.getData(4) == 1 || md.getData(6) == 1 || md.getData(9) == 1) {
-					needCheckLight = true;
-					speak("请关闭所有灯光,准备考试");
-				} else {
-					speak(routeTts, -1);
-				}
-			} else {
-				speak(routeTts);
+		if (Integer.parseInt(itemAllList.get(0).get("type").toString()) == 1) {
+			if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1 || md.getData(3) == 1 || md.getData(4) == 1 || md.getData(6) == 1 || md.getData(9) == 1) {
+				needCheckLight = true;
+				speak("请关闭所有灯光,准备考试");
+				return;
 			}
 		}
+		speak(routeTts, -1);
 	}
 
 	@Override
@@ -202,26 +188,23 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				});
 				if (fenshu >= 90) {
 					if (isAuto) {
-						islatlonMatched = false;
 						if (currId < itemAllList.size() - 1) {
-							currId++;
-							if (itemAllList.get(currId).get("type").toString().equals("1")) {
+							if (itemAllList.get(currId + 1).get("type").toString().equals("1")) {
 								try {
 									Thread.sleep(2000);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
 								if (!actionManager.IsRunning) {
-									speak(itemAllList.get(currId).get("tts").toString(), currId);
+									handler.sendEmptyMessage(++currId);
 								}
-							} else {
-								speak("完成");
 							}
-						} else {
-							speak("考试合格,您的得分为:" + fenshu + "分");
+						} else if (currId == itemAllList.size() - 1) {
+							if (itemAllList.get(currId).get("type").toString().equals("1")) {
+								speak("考试合格,您的得分为," + fenshu + "分");
+							}
 						}
-					} else {
-						speak("完成");
+						startMatch = true;
 					}
 				} else {
 					speak("考试不合格,您的扣分项目为," + errList.get(errList.size() - 1).get("errname") + ",请回中心打印成绩单");
@@ -243,7 +226,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				if (fenshu < 0) {
 					fenshu = 0;
 				}
-				handler.sendEmptyMessage(1);
+				runOnUiThread(new Runnable() {
+					public void run() {
+						refreshListView();
+					}
+				});
 			}
 		});
 
@@ -268,6 +255,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				map.put("lat", cursor.getFloat(cursor.getColumnIndex("lat")));
 				map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeout")));
 				map.put("type", cursor.getInt(cursor.getColumnIndex("type")));
+				map.put("over", "0");
 				if (cursor.getFloat(cursor.getColumnIndex("lon")) == 0 && cursor.getFloat(cursor.getColumnIndex("lat")) == 0) {
 					itemList.add(map);
 					itemNoMap.put(j, i);
@@ -291,8 +279,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						if (needCheckLight) {
 							speak("请关闭所有灯光，准备考试");
 						} else {
-							currId = arg2;							
-							speak(itemAllList.get(arg2).get("tts").toString(), arg2);
+							handler.sendEmptyMessage(arg2);
 						}
 					} else {
 						speak("考试不合格");
@@ -431,7 +418,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			_timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					handler.sendEmptyMessage(-1);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							txtTime.setText("用时：" + getTimeDiff(start, new Date()));
+							txtStatus.setText("经纬度:" + md.getLatLonString() + " 角度:" + md.getData(31) + "\n" + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
+						}
+					});
 					// 检查设备是否就绪
 					if (needCheckDevice) {
 						if (isDeviceOK) {
@@ -512,8 +504,9 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			fenshu = 0;
 		}
 		txtDefen.setText(String.valueOf(fenshu));
-		if (isAuto && fenshu >= 90) {
-			islatlonMatched = false;// 继续匹配经纬度
+		if (fenshu >= 90) {
+			if (!startMatch)
+				startMatch = true;
 		}
 	}
 
@@ -523,26 +516,24 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				md.setGPSSpeed(location.getSpeed());
 				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
-				if (!isMatching && !islatlonMatched && isAuto && !actionManager.IsRunning && location.getLatitude() != 0) {
-					isMatching = true;
+				if (startMatch && !actionManager.IsRunning && location.getLatitude() != 0) {
 					for (int i = 0; i < itemAllList.size(); i++) {
 						if (Float.parseFloat(itemAllList.get(i).get("lat").toString()) != 0f) {
 							Location loa = new Location("reverseGeocoded");
 							loa.setLatitude(Double.parseDouble(itemAllList.get(i).get("lat").toString()));
 							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
 							if (location.distanceTo(loa) < md.getRange()) {
-								islatlonMatched = true;
-								final int finai = i;
-								runOnUiThread(new Runnable() {
-									public void run() {
-										speak(itemAllList.get(finai).get("tts").toString(), finai);
-									}
-								});
+								if (itemAllList.get(i).get("over").toString().equals("0")) {
+									itemAllList.get(i).put("over", "1");
+									startMatch = false;
+									handler.sendEmptyMessage(i);
+								}
 								break;
+							} else {
+								itemAllList.get(i).put("over", "0");
 							}
 						}
 					}
-					isMatching = false;
 				}
 			}
 		}
@@ -579,19 +570,25 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void speak(String str, int index) {
-		if (index > -1) {
-			Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where itemid=" + itemAllList.get(index).get("itemid"));
-			if (cursor.getCount() > 0) {
+		if (mTts != null) {
+			if (index == -1) {
 				HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(index));
+				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "-1");
 				mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 			} else {
-				Toast.makeText(ExamActivity.this, "该项目还没有设置评判条件,请在[系统设置]-[项目设置]里设置", Toast.LENGTH_SHORT).show();
+				Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where itemid=" + itemAllList.get(index).get("itemid"));
+				if (cursor.getCount() > 0) {
+					HashMap<String, String> myHashAlarm = new HashMap<String, String>();
+					myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(index));
+					mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
+				} else {
+					handler.post(new Runnable() {
+						public void run() {
+							Toast.makeText(ExamActivity.this, "该项目还没有设置评判条件,请在[系统设置]-[项目设置]里设置", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
 			}
-		} else {
-			HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-			myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "-1");
-			mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 		}
 	}
 
