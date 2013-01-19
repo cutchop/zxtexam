@@ -20,6 +20,7 @@ import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +31,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -51,6 +53,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private TextView txtStatus;
 	private CheckBox cbHideAuto;
 	private TextView txtCurrentName;
+	private LinearLayout layDefen;
 	private ArrayList<HashMap<String, String>> errList;
 	private ArrayList<HashMap<String, Object>> itemList, itemAllList;
 	private Metadata md;
@@ -67,6 +70,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Boolean isAuto = false;
 	private Boolean needCheckLight = false;
 	private Boolean needCheckDevice = false;
+	private int checkdeviceTimeout = 10;
 	private Boolean startMatch = false;
 	private Map<Integer, Integer> itemNoMap;
 	private WakeLock wakeLock;
@@ -79,9 +83,17 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		public void handleMessage(Message msg) {
 			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout").toString()) == 0) {
 				speak(itemAllList.get(msg.what).get("tts").toString());
+				if (isAuto) {
+					startMatch = true;
+				}
 			} else {
 				currId = msg.what;
-				speak(itemAllList.get(msg.what).get("tts").toString(), msg.what);
+				if (itemAllList.get(msg.what).get("type").toString().equals("0")) {
+					speak(itemAllList.get(msg.what).get("tts").toString());
+					execItem(msg.what);
+				} else {
+					speak(itemAllList.get(msg.what).get("tts").toString(), msg.what);
+				}
 			}
 		}
 	};
@@ -169,6 +181,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		txtStatus = (TextView) findViewById(R.id.txtStatus);
 		cbHideAuto = (CheckBox) findViewById(R.id.cbHideAuto);
 		txtCurrentName = (TextView) findViewById(R.id.txtCurrentName);
+		layDefen = (LinearLayout) findViewById(R.id.layDefen);
 		md = (Metadata) getApplication();
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
@@ -188,6 +201,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				});
 				if (fenshu >= 90) {
 					if (isAuto) {
+						startMatch = true;
 						if (currId < itemAllList.size() - 1) {
 							if (itemAllList.get(currId + 1).get("type").toString().equals("1")) {
 								try {
@@ -204,7 +218,6 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 								speak("考试合格,您的得分为," + fenshu + "分");
 							}
 						}
-						startMatch = true;
 					}
 				} else {
 					speak("考试不合格,您的扣分项目为," + errList.get(errList.size() - 1).get("errname") + ",请回中心打印成绩单");
@@ -275,14 +288,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				if (actionManager.IsRunning) {
 					Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
 				} else {
-					if (fenshu >= 90) {
-						if (needCheckLight) {
-							speak("请关闭所有灯光，准备考试");
-						} else {
-							handler.sendEmptyMessage(arg2);
-						}
+					if (needCheckLight) {
+						speak("请关闭所有灯光，准备考试");
 					} else {
-						speak("考试不合格");
+						if (fenshu < 90) {
+							delAllListItem();
+						}
+						handler.sendEmptyMessage(arg2);
 					}
 				}
 			}
@@ -294,6 +306,29 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						delListItem(arg2);
+					}
+				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				}).create();
+				alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+						if (keyCode == KeyEvent.KEYCODE_HOME)
+							return true;
+						return false;
+					}
+				});
+				alertDialog.show();
+				alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+			}
+		});
+		
+		layDefen.setOnClickListener(new OnClickListener() {			
+			public void onClick(View v) {
+				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要清除扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						delAllListItem();
 					}
 				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -373,7 +408,6 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				destroy();
-				ExamActivity.this.finish();
 			}
 		});
 		// 隐藏自动触发的项目
@@ -421,7 +455,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					runOnUiThread(new Runnable() {
 						public void run() {
 							txtTime.setText("用时：" + getTimeDiff(start, new Date()));
-							txtStatus.setText("经纬度:" + md.getLatLonString() + " 角度:" + md.getData(31) + "\n" + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
+							txtStatus.setText("经纬度:" + md.getLatLonString() + "\n角度:" + md.getData(31) + " " + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
 						}
 					});
 					// 检查设备是否就绪
@@ -436,6 +470,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 									loadInit();
 								}
 							});
+						} else {
+							if (--checkdeviceTimeout <= 0) {
+								if (md.getDataResourceType() == 0) {
+									dismissDialog(DL_CHECKDEVICESTATUS);
+									DisplayError("设备连接失败");
+								}
+							}
 						}
 					}
 					// 灯光考试时检查是否已经关闭所有灯光，然后开始考试
@@ -484,7 +525,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				list.add(action);
 			} while (cursor.moveToNext());
 			cursor.close();
-			txtCurrentName.setText(itemAllList.get(index).get("itemname").toString());
+			txtCurrentName.setText(String.valueOf(index + 1) + ":" + itemAllList.get(index).get("itemname").toString());
 			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index).get("timeout").toString()));
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
@@ -503,10 +544,20 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		if (fenshu < 0) {
 			fenshu = 0;
 		}
+		if (isAuto) {
+			startMatch = true;
+		}
 		txtDefen.setText(String.valueOf(fenshu));
-		if (fenshu >= 90) {
-			if (!startMatch)
-				startMatch = true;
+	}
+
+	private void delAllListItem() {
+		fenshu = 100;
+		errList.clear();
+		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList);
+		listView.setAdapter(adapter);
+		txtDefen.setText(String.valueOf(fenshu));
+		if (isAuto) {
+			startMatch = true;
 		}
 	}
 
@@ -516,7 +567,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				md.setGPSSpeed(location.getSpeed());
 				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
-				if (startMatch && !actionManager.IsRunning && location.getLatitude() != 0) {
+				if (startMatch && fenshu >= 90 && !actionManager.IsRunning && location.getLatitude() != 0) {
 					for (int i = 0; i < itemAllList.size(); i++) {
 						if (Float.parseFloat(itemAllList.get(i).get("lat").toString()) != 0f) {
 							Location loa = new Location("reverseGeocoded");
@@ -524,11 +575,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
 							if (location.distanceTo(loa) < md.getRange()) {
 								if (itemAllList.get(i).get("over").toString().equals("0")) {
-									itemAllList.get(i).put("over", "1");
 									startMatch = false;
+									itemAllList.get(i).put("over", "1");
 									handler.sendEmptyMessage(i);
+									break;
 								}
-								break;
 							} else {
 								itemAllList.get(i).put("over", "0");
 							}
@@ -665,29 +716,27 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			destroy();
-			ExamActivity.this.finish();
 		}
 		return false;
 	}
 
 	@Override
 	protected void destroy() {
-		_timer.cancel();
-		_timerSerial.cancel();
+		super.destroy();
+		actionManager.destroy();
+		if (_timer != null) {
+			_timer.cancel();
+		}
+		if (_timerSerial != null) {
+			_timerSerial.cancel();
+		}
 		_timer = null;
 		_timerSerial = null;
-		actionManager.destroy();
 		if (mTts != null) {
-			try {
-				mTts.shutdown();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			mTts.shutdown();
+			mTts = null;
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+		Log.i("exam", "examactivity destroy");
+		ExamActivity.this.finish();
 	}
 }

@@ -86,7 +86,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			errmap.put(errvalues[i], errnames[i]);
 		}
 		cursor.close();
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			preference = findPreference("ie_action_" + i);
 			preference.setTitle(md.getName(i));
 			preference.setOnPreferenceChangeListener(this);
@@ -115,7 +115,8 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		((EditTextPreference) findPreference("ie_action_30_max")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_30_max").setOnPreferenceChangeListener(this);
 		findPreference("ie_action_31").setOnPreferenceChangeListener(this);
-		//((EditTextPreference) findPreference("ie_action_31_min")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
+		// ((EditTextPreference)
+		// findPreference("ie_action_31_min")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_31_min").setOnPreferenceChangeListener(this);
 		((EditTextPreference) findPreference("ie_action_31_max")).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		findPreference("ie_action_31_max").setOnPreferenceChangeListener(this);
@@ -137,8 +138,8 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		((ListPreference) preference).setEntryValues(errvalues);
 		preference.setOnPreferenceChangeListener(this);
 		preference = findPreference("ie_action_31_fanx");
-		((ListPreference) preference).setEntries(new String[] { "向左", "向右" });
-		((ListPreference) preference).setEntryValues(new String[] { "-1", "1" });
+		((ListPreference) preference).setEntries(new String[] { "向左", "向右", "不限" });
+		((ListPreference) preference).setEntryValues(new String[] { "-1", "1", "0" });
 		preference.setSummary("向左");
 		preference.setOnPreferenceChangeListener(this);
 
@@ -163,6 +164,11 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 							findPreference("ie_action_31_fanx").setSummary("向右");
 							fanx = 1;
 						}
+						if (cursor.getInt(cursor.getColumnIndex("times")) == 1) {
+							findPreference("ie_action_31_fanx").setSummary("不限");
+							fanx = 0;
+						}
+
 					} else {
 						findPreference("ie_action_" + id + "_min").setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("min"))));
 						findPreference("ie_action_" + id + "_max").setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("max"))));
@@ -239,7 +245,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 				String id = key.replace("ie_action_", "").replace("_min", "");
 				md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				if (id.equals("31")) {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and max=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=" + (Integer.parseInt(arg1.toString()) * (fanx == 0 ? 1 : fanx)) + " where itemid=" + itemid + " and dataid=" + id + " and max=0 and step=" + step);
 				}
 				arg0.setSummary(arg1.toString());
 			} else if (key.endsWith("_max")) {
@@ -249,7 +255,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 				String id = key.replace("ie_action_", "").replace("_max", "");
 				md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + arg1 + " where itemid=" + itemid + " and dataid=" + id + " and step=" + step);
 				if (id.equals("31")) {
-					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + (Integer.parseInt(arg1.toString()) * fanx) + " where itemid=" + itemid + " and dataid=" + id + " and min=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=" + (Integer.parseInt(arg1.toString()) * (fanx == 0 ? 1 : fanx)) + " where itemid=" + itemid + " and dataid=" + id + " and min=0 and step=" + step);
 				}
 				arg0.setSummary(arg1.toString());
 			} else if (key.endsWith("_fanx")) {
@@ -260,12 +266,18 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 					fanx = 1;
 					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max < 0 and min=0 and step=" + step);
 					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min < 0 and max=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=0 where itemid=" + itemid + " and dataid=31 and step=" + step);
 					arg0.setSummary("向右");
-				} else {
+				} else if (Integer.parseInt(arg1.toString()) == -1) {
 					fanx = -1;
 					md.execSQL("update " + DBer.T_ITEM_ACTION + " set max=max*-1 where itemid=" + itemid + " and dataid=31 and max > 0 and min=0 and step=" + step);
 					md.execSQL("update " + DBer.T_ITEM_ACTION + " set min=min*-1 where itemid=" + itemid + " and dataid=31 and min > 0 and max=0 and step=" + step);
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=0 where itemid=" + itemid + " and dataid=31 and step=" + step);
 					arg0.setSummary("向左");
+				} else {
+					fanx = 0;
+					md.execSQL("update " + DBer.T_ITEM_ACTION + " set times=1 where itemid=" + itemid + " and dataid=31 and step=" + step);
+					arg0.setSummary("不限");
 				}
 			} else {
 				String id = key.replace("ie_action_", "");
@@ -300,7 +312,7 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			editor.remove("ie_name");
 			editor.remove("ie_tts");
 			editor.remove("ie_timeout");
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < 17; i++) {
 				editor.remove("ie_action_" + i);
 				editor.remove("ie_action_" + i + "_times");
 				editor.remove("ie_action_" + i + "_err");

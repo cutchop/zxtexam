@@ -24,17 +24,17 @@ public class Metadata extends Application {
 	private float lat = 0f;
 	private float lon = 0f;
 	private SharedPreferences settings;
-	private static final String[] DEF_XINHAO_NAME = { "示宽灯", "近光灯", "远光灯", "左转向灯", "右转向灯", "停车制动器", "应急灯", "行车制动器", "点火信号", "雾灯", "信号11", "信号12", "车门", "信号14", "喇叭", "信号16" };
+	private static final String[] DEF_XINHAO_NAME = { "示宽灯", "近光灯", "远光灯", "左转向灯", "右转向灯", "停车制动器", "应急灯", "行车制动器", "点火信号", "雾灯", "信号11", "信号12", "车门", "信号14", "喇叭", "信号16", "转向灯" };
 	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
 	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
-	private static final int DEF_RANGE = 10;
+	private static final int DEF_RANGE = 50;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
 	private static final String DEF_BAUDRATE = "115200";
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 47;
+	private static final int DBVERSION = 52;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -64,6 +64,7 @@ public class Metadata extends Application {
 		data_Xinhao.put(13, 0);
 		data_Xinhao.put(14, 0);
 		data_Xinhao.put(15, 0);
+		data_Xinhao.put(16, 0);
 
 		data_Maichong.put(20, 0);
 		data_Maichong.put(21, 0);
@@ -93,7 +94,7 @@ public class Metadata extends Application {
 		}
 		if (id == 21) {
 			if (!settings.getBoolean("usegpsspeed", false)) {
-				data_Maichong.put(id, Math.round(val / getMaichongXS(id - 19)));
+				data_Maichong.put(id, val);
 			}
 			return;
 		}
@@ -133,7 +134,11 @@ public class Metadata extends Application {
 
 	public int getData(int id) {
 		if (id < 20) {
-			return data_Xinhao.get(id);
+			if (id == 16) {// 转向灯
+				return data_Xinhao.get(3) + data_Xinhao.get(4);
+			} else {
+				return data_Xinhao.get(id);
+			}
 		}
 		if (id < 30) {
 			return Math.round((float) data_Maichong.get(id) * getMaichongXS(id - 19));
@@ -149,7 +154,7 @@ public class Metadata extends Application {
 
 	public String get16DataString() {
 		StringBuffer sBuffer = new StringBuffer();
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			sBuffer.append(data_Xinhao.get(i));
 		}
 		return sBuffer.toString();

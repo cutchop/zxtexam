@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -143,4 +144,11 @@ public class ChooseActivity extends Activity implements OnInitListener {
 		}
 	};
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			ChooseActivity.this.finish();
+		}
+		return false;
+	}
 }

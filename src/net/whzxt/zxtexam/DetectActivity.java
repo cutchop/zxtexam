@@ -59,7 +59,7 @@ public class DetectActivity extends SerialPortActivity {
 		PowerManager manager = ((PowerManager) getSystemService(POWER_SERVICE));
 		wakeLock = manager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "ATAAW");
 		wakeLock.acquire();
-		
+
 		txtReception = (EditText) findViewById(R.id.txtReception);
 		textView0 = (TextView) findViewById(R.id.textView0);
 		textView1 = (TextView) findViewById(R.id.textView1);
@@ -144,7 +144,7 @@ public class DetectActivity extends SerialPortActivity {
 		}
 		if (locationManager == null) {
 			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, locationListener);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 			changeGPS();
 		}
 	}
@@ -289,13 +289,16 @@ public class DetectActivity extends SerialPortActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			destroy();
-			DetectActivity.this.finish();
 		}
 		return false;
 	}
 
 	@Override
 	protected void destroy() {
-		_timer.cancel();
+		super.destroy();
+		if (_timer != null) {
+			_timer.cancel();
+		}
+		DetectActivity.this.finish();
 	}
 }

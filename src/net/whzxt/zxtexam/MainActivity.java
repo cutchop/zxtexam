@@ -34,6 +34,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -335,5 +336,14 @@ public class MainActivity extends Activity {
 				}
 			}
 		}.execute();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			MainActivity.this.finish();
+			System.exit(0);
+		}
+		return false;
 	}
 }

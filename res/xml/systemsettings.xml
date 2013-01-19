@@ -24,6 +24,7 @@
         <EditTextPreference android:title="信号14" android:summary="点击设置信号14的名称" android:key="name13"/>
         <EditTextPreference android:title="信号15" android:summary="点击设置信号15的名称" android:key="name14"/>
         <EditTextPreference android:title="信号16" android:summary="点击设置信号16的名称" android:key="name15"/>
+        <EditTextPreference android:title="信号17" android:summary="点击设置信号17的名称" android:key="name16"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="脉冲设置">
         <EditTextPreference android:title="脉冲1" android:summary="点击设置脉冲1的名称" android:key="name20"/>

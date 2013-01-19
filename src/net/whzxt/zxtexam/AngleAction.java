@@ -28,12 +28,18 @@ public class AngleAction extends BaseAction {
 			if (angle > 200) {
 				angle = (360 - angle) * -1;
 			}
-			if (_min > 0) {
-				if (angle >= _min) {
-					_isOK = true;
+			if (_times == 0) {
+				if (_min > 0) {//向右
+					if (angle >= _min) {
+						_isOK = true;
+					}
+				} else {//向左
+					if (angle <= _min) {
+						_isOK = true;
+					}
 				}
-			} else {
-				if (angle <= _min) {
+			} else {//不限方向
+				if (Math.abs(angle) >= Math.abs(_min)) {
 					_isOK = true;
 				}
 			}

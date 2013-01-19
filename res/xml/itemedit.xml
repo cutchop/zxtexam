@@ -70,5 +70,8 @@
         <CheckBoxPreference android:title="信号16" android:key="ie_action_15"/>
         <ListPreference android:title="条件" android:key="ie_action_15_times" android:dependency="ie_action_15"/>
         <ListPreference android:title="扣分项" android:key="ie_action_15_err" android:dependency="ie_action_15"/>
+        <CheckBoxPreference android:title="信号17" android:key="ie_action_16"/>
+        <ListPreference android:title="条件" android:key="ie_action_16_times" android:dependency="ie_action_16"/>
+        <ListPreference android:title="扣分项" android:key="ie_action_16_err" android:dependency="ie_action_16"/>
     </PreferenceCategory>
 </PreferenceScreen>

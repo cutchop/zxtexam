@@ -95,11 +95,11 @@ public abstract class SerialPortActivity extends Activity {
 		}
 	}
 
-	private void DisplayError(int resourceId) {
+	protected void DisplayError(int resourceId) {
 		DisplayError(getString(resourceId));
 	}
 
-	private void DisplayError(String msg) {
+	protected void DisplayError(String msg) {
 		if (mTts != null) {
 			mTts.speak(msg, TextToSpeech.QUEUE_FLUSH, null);
 		}
@@ -109,7 +109,6 @@ public abstract class SerialPortActivity extends Activity {
 		b.setPositiveButton("关闭", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				destroy();
-				SerialPortActivity.this.finish();
 			}
 		});
 		b.show();
@@ -278,10 +277,7 @@ public abstract class SerialPortActivity extends Activity {
 
 	protected abstract void onDataReceived(final byte[] buffer, final int size);
 
-	protected abstract void destroy();
-
-	@Override
-	protected void onDestroy() {
+	protected void destroy() {
 		if (mReadThread != null) {
 			mReadThread.interrupt();
 		}
@@ -295,6 +291,5 @@ public abstract class SerialPortActivity extends Activity {
 			}
 		}
 		Log.i("exam", "serialportactivity destroy");
-		super.onDestroy();
 	}
 }

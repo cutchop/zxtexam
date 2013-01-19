@@ -73,7 +73,7 @@ public class RouteEditActivity extends Activity {
 		}
 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 
 		radAutoTrue.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -160,80 +160,75 @@ public class RouteEditActivity extends Activity {
 						bdjwd = true;
 						if (md.getLatlon()[0] != 0) {
 							String[] strs = { "绑定当前位置:" + md.getLatLonString(), "不绑定位置信息" };
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help)
-									.setItems(strs, new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											if (which == 1) {
-												bdjwd = false;
-											}
-											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add)
-													.setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-														public void onClick(DialogInterface dialog, int which) {
-															return;
-														}
-													}).create();
-											dialog2.show();
-										}
-									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-							alertDialog.show();
-						} else {
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?")
-									.setIcon(android.R.drawable.ic_menu_help).setPositiveButton("继续", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											bdjwd = false;
-											AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add)
-													.setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-														public void onClick(DialogInterface dialog, int which) {
-															return;
-														}
-													}).create();
-											dialog2.show();
-										}
-									}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-							alertDialog.show();
-						}
-					}
-				} else {
-					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help)
-							.setItems(new String[] { "上移", "下移", "删除" }, new DialogInterface.OnClickListener() {
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help).setItems(strs, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									if (which == 0 || which == 1) {
-										Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-										if (cursor.moveToFirst()) {
-											int xuhao = cursor.getInt(cursor.getColumnIndex("xuhao"));
-											if (which == 0) {
-												if (arg2 > 0) {
-													md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao - 1));
-													md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao - 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-													load();
-												}
-											} else {
-												if (arg2 < data.size() - 2) {
-													md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao + 1));
-													md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao + 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-													load();
-												}
-											}
-										}
-										cursor.close();
-									} else {
-										md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-										load();
+									if (which == 1) {
+										bdjwd = false;
 									}
+									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+									dialog2.show();
 								}
 							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
 									return;
 								}
 							}).create();
+							alertDialog.show();
+						} else {
+							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("继续", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									bdjwd = false;
+									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int which) {
+											return;
+										}
+									}).create();
+									dialog2.show();
+								}
+							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									return;
+								}
+							}).create();
+							alertDialog.show();
+						}
+					}
+				} else {
+					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setItems(new String[] { "上移", "下移", "删除" }, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							if (which == 0 || which == 1) {
+								Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+								if (cursor.moveToFirst()) {
+									int xuhao = cursor.getInt(cursor.getColumnIndex("xuhao"));
+									if (which == 0) {
+										if (arg2 > 0) {
+											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao - 1));
+											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao - 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+											load();
+										}
+									} else {
+										if (arg2 < data.size() - 2) {
+											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao + 1));
+											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao + 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+											load();
+										}
+									}
+								}
+								cursor.close();
+							} else {
+								md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+								load();
+							}
+						}
+					}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							return;
+						}
+					}).create();
 					alertDialog.show();
 				}
 			}
@@ -245,10 +240,12 @@ public class RouteEditActivity extends Activity {
 		data.clear();
 		map.clear();
 		Cursor cursor = md.rawQuery("select a.itemid,b.name from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		int i = 0;
 		if (cursor.moveToFirst()) {
 			do {
-				data.add(cursor.getString(cursor.getColumnIndex("name")));
-				map.put(cursor.getString(cursor.getColumnIndex("name")), cursor.getInt(cursor.getColumnIndex("itemid")));
+				i++;
+				data.add("(" + i + ")" + cursor.getString(cursor.getColumnIndex("name")));
+				map.put("(" + i + ")" + cursor.getString(cursor.getColumnIndex("name")), cursor.getInt(cursor.getColumnIndex("itemid")));
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
