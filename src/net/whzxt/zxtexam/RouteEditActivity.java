@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
@@ -41,7 +42,6 @@ public class RouteEditActivity extends Activity {
 	private Map<Integer, Integer> mapItems;
 	private String[] strItems;
 	private LocationManager locationManager;
-	private Boolean bdjwd = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,6 @@ public class RouteEditActivity extends Activity {
 		listView = (ListView) findViewById(R.id.listView1);
 		radAutoFalse = (RadioButton) findViewById(R.id.radAutoFalse);
 		radAutoTrue = (RadioButton) findViewById(R.id.radAutoTrue);
-
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
 
@@ -157,20 +156,11 @@ public class RouteEditActivity extends Activity {
 					if (routeid == -1) {
 						Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
 					} else {
-						bdjwd = true;
 						if (md.getLatlon()[0] != 0) {
 							String[] strs = { "绑定当前位置:" + md.getLatLonString(), "不绑定位置信息" };
 							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help).setItems(strs, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									if (which == 1) {
-										bdjwd = false;
-									}
-									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-									dialog2.show();
+									add(which == 0);
 								}
 							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
@@ -181,13 +171,7 @@ public class RouteEditActivity extends Activity {
 						} else {
 							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("继续", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
-									bdjwd = false;
-									AlertDialog dialog2 = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择要添加的项目").setIcon(android.R.drawable.ic_menu_add).setItems(strItems, onselect).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog, int which) {
-											return;
-										}
-									}).create();
-									dialog2.show();
+									add(false);
 								}
 							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
@@ -198,9 +182,9 @@ public class RouteEditActivity extends Activity {
 						}
 					}
 				} else {
-					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setItems(new String[] { "上移", "下移", "删除" }, new DialogInterface.OnClickListener() {
+					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setItems(new String[] { "上移", "下移", "修改", "删除" }, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							if (which == 0 || which == 1) {
+							if (which < 3) {
 								Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
 								if (cursor.moveToFirst()) {
 									int xuhao = cursor.getInt(cursor.getColumnIndex("xuhao"));
@@ -210,12 +194,21 @@ public class RouteEditActivity extends Activity {
 											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao - 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
 											load();
 										}
-									} else {
+									} else if (which == 1) {
 										if (arg2 < data.size() - 2) {
 											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao + 1));
 											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao + 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
 											load();
 										}
+									} else{
+										Intent intent = new Intent();
+										Bundle bundle = new Bundle();
+										bundle.putInt("routeid", routeid);
+										bundle.putInt("itemid", map.get(itemname));
+										bundle.putInt("xuhao", xuhao);
+										intent.putExtras(bundle);
+										intent.setClass(RouteEditActivity.this, RouteItemEditActivity.class);
+										startActivityForResult(intent, 0);
 									}
 								}
 								cursor.close();
@@ -253,23 +246,34 @@ public class RouteEditActivity extends Activity {
 		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
 	}
 
-	private DialogInterface.OnClickListener onselect = new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int which) {
+	private void add(Boolean bindLatlon) {
+		int xuhao = 1;
+		Cursor cursor = md.rawQuery("select xuhao from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " order by xuhao desc");
+		if (cursor.moveToFirst()) {
+			xuhao = cursor.getInt(0) + 1;
+		}
+		cursor.close();
+		if (bindLatlon) {
 			float[] latlon = md.getLatlon();
-			if (!bdjwd) {
-				latlon[0] = 0;
-				latlon[1] = 0;
-			}
-			int xuhao = 1;
-			Cursor cursor = md.rawQuery("select xuhao from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " order by xuhao desc");
-			if (cursor.moveToFirst()) {
-				xuhao = cursor.getInt(0) + 1;
-			}
-			cursor.close();
-			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,xuhao) values(" + routeid + "," + mapItems.get(which) + "," + latlon[1] + "," + latlon[0] + "," + xuhao + ")");
+			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,xuhao) values(" + routeid + ",0," + latlon[1] + "," + latlon[0] + "," + xuhao + ")");
+		} else {
+			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,xuhao) values(" + routeid + ",0,0,0," + xuhao + ")");
+		}
+		Intent intent = new Intent();
+		Bundle bundle = new Bundle();
+		bundle.putInt("routeid", routeid);
+		bundle.putInt("xuhao", xuhao);
+		intent.putExtras(bundle);
+		intent.setClass(RouteEditActivity.this, RouteItemEditActivity.class);
+		startActivityForResult(intent, 0);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
 			load();
 		}
-	};
+	}
 
 	private final LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {

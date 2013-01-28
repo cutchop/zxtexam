@@ -14,12 +14,37 @@ public class ActionManager {
 
 	public Boolean IsRunning = false;
 	public int TotalPoints = 100; // 总分
+	private Metadata _md;
 	private Timer _timer;
 	private int _step = 1;
 	private int _timeout = 0;
+	private int _range = 0;
+	private int _delay = 0;
+	private static int DEFTIMEOUT = 300;// 默认300秒
+	private static int DEFRANGE = 30000;// 默认30公里
 
 	public void setTimeout(int t) {
-		_timeout = t * (1000 / Metadata.PERIOD);
+		if (t == 0) {
+			_timeout = DEFTIMEOUT * (1000 / Metadata.PERIOD);
+		} else {
+			_timeout = t * (1000 / Metadata.PERIOD);
+		}
+	}
+
+	public void setDelay(int d) {
+		_delay = d;
+	}
+
+	public void setRange(int r) {
+		if (r == 0) {
+			_range = DEFRANGE;
+		} else {
+			_range = r;
+		}
+	}
+
+	public void setMetadata(Metadata md) {
+		_md = md;
 	}
 
 	private List<BaseAction> _listActions;
@@ -42,7 +67,8 @@ public class ActionManager {
 		_onStatusChange = osc;
 	}
 
-	public BaseAction GetActionObject(Metadata md, int dataid, int times, int max, int min) {
+	public BaseAction GetActionObject(Metadata md, int dataid, int times,
+			int max, int min) {
 		if (dataid < 20) {
 			return new SignalAction(md, dataid, times, min, max);
 		}
@@ -68,17 +94,25 @@ public class ActionManager {
 						return;
 					}
 					if (_timeout > 0) {
+						if (_timeout % (1000 / Metadata.PERIOD) == 0) {
+							if (_md != null) {
+								_range = _range
+										- (_md.getData(21) * 1000 / 3600);
+							}
+						}
 						_timeout--;
-						if (_timeout == 0) {
+						if (_timeout <= 0 || _range <= 0) {
 							List<Integer> list = null;
 							for (int i = 0; i < _listActions.size(); i++) {
 								if (_listActions.get(i).IsMustOK(_step)) {
-									if (!_listActions.get(i).CheckOK(_step) && _listActions.get(i).Fenshu > 0) {
+									if (!_listActions.get(i).CheckOK(_step)
+											&& _listActions.get(i).Fenshu > 0) {
 										if (list == null) {
 											list = new ArrayList<Integer>();
 										}
 										list.add(i);
-										TotalPoints = TotalPoints - _listActions.get(i).Fenshu;
+										TotalPoints = TotalPoints
+												- _listActions.get(i).Fenshu;
 										if (TotalPoints < 90) {
 											break;
 										}
@@ -108,7 +142,8 @@ public class ActionManager {
 							if (!b) {
 								_step--;
 								for (int i = 0; i < _listActions.size(); i++) {
-									if (_listActions.get(i).IsWaitTimeout(_step)) {
+									if (_listActions.get(i)
+											.IsWaitTimeout(_step)) {
 										b = true;
 									}
 								}
@@ -121,12 +156,14 @@ public class ActionManager {
 						List<Integer> list = null;
 						for (int i = 0; i < _listActions.size(); i++) {
 							_listActions.get(i).CheckOK(_step);
-							if (_listActions.get(i).CheckError(_step) && _listActions.get(i).Fenshu > 0) {
+							if (_listActions.get(i).CheckError(_step)
+									&& _listActions.get(i).Fenshu > 0) {
 								if (list == null) {
 									list = new ArrayList<Integer>();
 								}
 								list.add(i);
-								TotalPoints = TotalPoints - _listActions.get(i).Fenshu;
+								TotalPoints = TotalPoints
+										- _listActions.get(i).Fenshu;
 								if (TotalPoints < 90) {
 									break;
 								}
@@ -137,7 +174,7 @@ public class ActionManager {
 						}
 					}
 				}
-			}, 1000, Metadata.PERIOD);
+			}, 1000 + _delay * 1000, Metadata.PERIOD);
 		}
 	}
 

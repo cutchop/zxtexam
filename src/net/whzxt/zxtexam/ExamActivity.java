@@ -52,7 +52,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private GridView gridView;
 	private TextView txtStatus;
 	private CheckBox cbHideAuto;
-	private TextView txtCurrentName;
+	private TextView txtCurrentName, txtMile;
 	private LinearLayout layDefen;
 	private ArrayList<HashMap<String, String>> errList;
 	private ArrayList<HashMap<String, Object>> itemList, itemAllList;
@@ -77,11 +77,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private final int DL_SEARCHING = 0x01;
 	private final int DL_CONNECTING = 0x02;
 	private final int DL_CHECKDEVICESTATUS = 0x03;
+	private int mile = 0;
 
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout").toString()) == 0) {
+			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout").toString()) + Integer.parseInt(itemAllList.get(msg.what).get("range").toString()) == 0) {
 				speak(itemAllList.get(msg.what).get("tts").toString());
 				if (isAuto) {
 					startMatch = true;
@@ -182,6 +183,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		cbHideAuto = (CheckBox) findViewById(R.id.cbHideAuto);
 		txtCurrentName = (TextView) findViewById(R.id.txtCurrentName);
 		layDefen = (LinearLayout) findViewById(R.id.layDefen);
+		txtMile = (TextView) findViewById(R.id.txtMile);
 		md = (Metadata) getApplication();
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
@@ -212,12 +214,18 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 								if (!actionManager.IsRunning) {
 									handler.sendEmptyMessage(++currId);
 								}
+							} else {
+								speak(itemAllList.get(currId).get("endtts").toString());
 							}
 						} else if (currId == itemAllList.size() - 1) {
 							if (itemAllList.get(currId).get("type").toString().equals("1")) {
 								speak("考试合格,您的得分为," + fenshu + "分");
+							} else {
+								speak(itemAllList.get(currId).get("endtts").toString());
 							}
 						}
+					} else {
+						speak(itemAllList.get(currId).get("endtts").toString());
 					}
 				} else {
 					speak("考试不合格,您的扣分项目为," + errList.get(errList.size() - 1).get("errname") + ",请回中心打印成绩单");
@@ -254,7 +262,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,b.name as itemname,b.tts,b.timeout,b.type from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i, j;
 		i = j = 0;
 		if (cursor.moveToFirst()) {
@@ -264,9 +272,29 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				map.put("itemid", cursor.getInt(cursor.getColumnIndex("itemid")));
 				map.put("itemname", cursor.getString(cursor.getColumnIndex("itemname")));
 				map.put("tts", cursor.getString(cursor.getColumnIndex("tts")));
+				map.put("endtts", cursor.getString(cursor.getColumnIndex("endtts")));
 				map.put("lon", cursor.getFloat(cursor.getColumnIndex("lon")));
 				map.put("lat", cursor.getFloat(cursor.getColumnIndex("lat")));
-				map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeout")));
+				if (cursor.getInt(cursor.getColumnIndex("delay")) == 0) {
+					map.put("delay", cursor.getInt(cursor.getColumnIndex("delaydef")));
+				} else {
+					map.put("delay", cursor.getInt(cursor.getColumnIndex("delay")));
+				}
+				if (cursor.getInt(cursor.getColumnIndex("gpsrange")) == 0) {
+					map.put("gpsrange", md.getRange());
+				} else {
+					map.put("gpsrange", cursor.getInt(cursor.getColumnIndex("gpsrange")));
+				}
+				if (cursor.getInt(cursor.getColumnIndex("timeout")) == 0) {
+					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeoutdef")));
+				} else {
+					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeout")));
+				}
+				if (cursor.getInt(cursor.getColumnIndex("timeout")) == 0) {
+					map.put("range", cursor.getInt(cursor.getColumnIndex("rangedef")));
+				} else {
+					map.put("range", cursor.getInt(cursor.getColumnIndex("range")));
+				}
 				map.put("type", cursor.getInt(cursor.getColumnIndex("type")));
 				map.put("over", "0");
 				if (cursor.getFloat(cursor.getColumnIndex("lon")) == 0 && cursor.getFloat(cursor.getColumnIndex("lat")) == 0) {
@@ -323,8 +351,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 			}
 		});
-		
-		layDefen.setOnClickListener(new OnClickListener() {			
+
+		layDefen.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要清除扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -452,9 +480,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			_timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
+					mile += (md.getData(21) * 1000 / 3600);
 					runOnUiThread(new Runnable() {
 						public void run() {
 							txtTime.setText("用时：" + getTimeDiff(start, new Date()));
+							txtMile.setText("里程：" + getMileString());
 							txtStatus.setText("经纬度:" + md.getLatLonString() + "\n角度:" + md.getData(31) + " " + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
 						}
 					});
@@ -526,7 +556,10 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			} while (cursor.moveToNext());
 			cursor.close();
 			txtCurrentName.setText(String.valueOf(index + 1) + ":" + itemAllList.get(index).get("itemname").toString());
+			actionManager.setMetadata(md);
+			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
 			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index).get("timeout").toString()));
+			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("gpsrange").toString()));
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
 			actionManager.Start();
@@ -573,7 +606,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 							Location loa = new Location("reverseGeocoded");
 							loa.setLatitude(Double.parseDouble(itemAllList.get(i).get("lat").toString()));
 							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
-							if (location.distanceTo(loa) < md.getRange()) {
+							if (location.distanceTo(loa) <= Integer.parseInt(itemAllList.get(i).get("gpsrange").toString())) {
 								if (itemAllList.get(i).get("over").toString().equals("0")) {
 									startMatch = false;
 									itemAllList.get(i).put("over", "1");
@@ -611,6 +644,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void speak(String str) {
+		if (str == null) {
+			return;
+		}
+		if (str.equals("")) {
+			return;
+		}
 		if (mTts != null) {
 			try {
 				mTts.speak(str, TextToSpeech.QUEUE_FLUSH, null);
@@ -621,6 +660,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void speak(String str, int index) {
+		if (str == null) {
+			return;
+		}
+		if (str.equals("")) {
+			return;
+		}
 		if (mTts != null) {
 			if (index == -1) {
 				HashMap<String, String> myHashAlarm = new HashMap<String, String>();
@@ -641,6 +686,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				}
 			}
 		}
+	}
+
+	private String getMileString() {
+		if (mile < 10000) {
+			return mile + "米";
+		}
+		return (mile / 1000) + "公里";
 	}
 
 	@Override

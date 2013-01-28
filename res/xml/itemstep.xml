@@ -2,7 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <EditTextPreference android:title="项目名称" android:key="ie_name"/>
     <EditTextPreference android:title="语音提示" android:key="ie_tts"/>
-    <EditTextPreference android:title="时长" android:key="ie_timeout"/>
+    <EditTextPreference android:title="延时(秒)" android:key="ie_delay"/>
+    <EditTextPreference android:title="完成时语音提示" android:key="ie_endtts"/>
+    <EditTextPreference android:title="时长(秒)" android:key="ie_timeout"/>
+    <EditTextPreference android:title="距离(米)" android:key="ie_range"/>
     <PreferenceCategory android:title="步骤">
         <Preference android:key="step1" android:title="步骤1"/>
         <Preference android:key="step2" android:title="步骤2"/>

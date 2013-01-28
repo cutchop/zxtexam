@@ -55,13 +55,6 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			preference = findPreference("ie_name");
 			preference.setSummary(cursor.getString(cursor.getColumnIndex("name")));
 			preference.setOnPreferenceChangeListener(this);
-			preference = findPreference("ie_tts");
-			preference.setSummary(cursor.getString(cursor.getColumnIndex("tts")));
-			preference.setOnPreferenceChangeListener(this);
-			preference = findPreference("ie_timeout");
-			((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
-			preference.setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("timeout")) + "秒"));
-			preference.setOnPreferenceChangeListener(this);
 		}
 		cursor.close();
 
@@ -189,22 +182,6 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			arg0.setSummary(arg1.toString());
 			return true;
 		}
-		if (key.equals("ie_tts")) {
-			if (arg1.toString().trim().equals("")) {
-				return false;
-			}
-			md.execSQL("update " + DBer.T_ITEM + " set tts='" + arg1 + "' where itemid=" + itemid);
-			arg0.setSummary(arg1.toString());
-			return true;
-		}
-		if (key.equals("ie_timeout")) {
-			if (arg1.toString().trim().equals("")) {
-				return false;
-			}
-			md.execSQL("update " + DBer.T_ITEM + " set timeout=" + arg1 + " where itemid=" + itemid);
-			arg0.setSummary(arg1.toString() + "秒");
-			return true;
-		}
 		if (key.startsWith("ie_action_")) {
 			if (key.endsWith("_times")) {
 				String id = key.replace("ie_action_", "").replace("_times", "");
@@ -310,8 +287,6 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 			SharedPreferences.Editor editor = settings.edit();
 			editor.remove("ie_name");
-			editor.remove("ie_tts");
-			editor.remove("ie_timeout");
 			for (int i = 0; i < 17; i++) {
 				editor.remove("ie_action_" + i);
 				editor.remove("ie_action_" + i + "_times");

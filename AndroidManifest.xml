@@ -22,6 +22,7 @@
         <activity android:name=".ExamActivity" android:launchMode="singleTask" android:screenOrientation="landscape"></activity>
         <activity android:name=".RouteActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".RouteEditActivity" android:screenOrientation="landscape"></activity>
+        <activity android:name=".RouteItemEditActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".ItemEditActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".SystemActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".ItemsActivity" android:screenOrientation="landscape"></activity>

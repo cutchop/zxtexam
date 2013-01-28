@@ -148,7 +148,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ITEM);
-					sBuffer.append("(itemid, name, tts, timeout, type, xuhao) VALUES (");
+					sBuffer.append("(itemid, name, tts, timeout, type, xuhao, endtts, range, delay) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
 					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
@@ -160,6 +160,12 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("type")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("xuhao")));
+					sBuffer.append(",");
+					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("endtts")) + "'");
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("range")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delay")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
@@ -203,7 +209,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE_ITEM);
-					sBuffer.append("(routeid, itemid, lon, lat, xuhao) VALUES (");
+					sBuffer.append("(routeid, itemid, lon, lat, gpsrange, timeout, delay, range, xuhao) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
@@ -211,6 +217,14 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lon")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lat")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("gpsrange")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("timeout")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delay")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("range")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("xuhao")));
 					sBuffer.append(")\");\n");
