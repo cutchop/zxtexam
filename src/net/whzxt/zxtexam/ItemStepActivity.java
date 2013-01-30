@@ -45,7 +45,7 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 					}
 					cursor.close();
 					if (newid > -1) {
-						md.execSQL("insert into " + DBer.T_ITEM + "(itemid, name, tts, timeout, type, xuhao, endtts, range, delay) VALUES (" + newid + ",'新项目','新项目语音提示',20," + which + "," + xuhao + ",'',0,0)");
+						md.execSQL("insert into " + DBer.T_ITEM + "(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (" + newid + ",'新项目','新项目语音提示',20," + which + "," + xuhao + ",'',0,0,0)");
 						itemid = newid;
 						Preference preference = findPreference("ie_name");
 						preference.setSummary("新项目");
@@ -59,6 +59,9 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 						((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 						preference.setOnPreferenceChangeListener(ItemStepActivity.this);
 						preference = findPreference("ie_delay");
+						((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
+						preference.setOnPreferenceChangeListener(ItemStepActivity.this);
+						preference = findPreference("ie_delaymeter");
 						((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 						preference.setOnPreferenceChangeListener(ItemStepActivity.this);
 						preference = findPreference("ie_range");
@@ -100,6 +103,12 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 				((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 				if (cursor.getInt(cursor.getColumnIndex("delay")) > 0) {
 					preference.setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("delay")) + "秒"));
+				}
+				preference.setOnPreferenceChangeListener(this);
+				preference = findPreference("ie_delaymeter");
+				((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
+				if (cursor.getInt(cursor.getColumnIndex("delaymeter")) > 0) {
+					preference.setSummary(String.valueOf(cursor.getInt(cursor.getColumnIndex("delaymeter")) + "米"));
 				}
 				preference.setOnPreferenceChangeListener(this);
 				preference = findPreference("ie_range");
@@ -174,6 +183,18 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 			}
 			return true;
 		}
+		if (key.equals("ie_delaymeter")) {
+			if (arg1.toString().trim().equals("")) {
+				return false;
+			}
+			md.execSQL("update " + DBer.T_ITEM + " set delaymeter=" + arg1 + " where itemid=" + itemid);
+			if (arg1.toString().equals("0")) {
+				arg0.setSummary("");
+			} else {
+				arg0.setSummary(arg1.toString() + "秒");
+			}
+			return true;
+		}
 		if (key.equals("ie_range")) {
 			if (arg1.toString().trim().equals("")) {
 				return false;
@@ -235,6 +256,7 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 		editor.remove("ie_endtts");
 		editor.remove("ie_timeout");
 		editor.remove("ie_delay");
+		editor.remove("ie_delaymeter");
 		editor.remove("ie_range");
 		for (int i = 1; i < 8; i++) {
 			editor.remove("step" + i);

@@ -3,6 +3,7 @@
     <ListPreference android:title="点击选择项目" android:key="ri_item"/>
     <EditTextPreference android:key="ri_gpsrange" android:title="阈值(自动触发项目的范围,单位:米)"/>
     <EditTextPreference android:title="延时(秒)" android:key="ri_delay"/>
+    <EditTextPreference android:title="延迟距离(米)" android:key="ri_delaymeter"/>
     <EditTextPreference android:title="时长(秒)" android:key="ri_timeout"/>
     <EditTextPreference android:title="距离(米)" android:key="ri_range"/>
     <Preference android:key="ri_ok" android:title="确定"/>

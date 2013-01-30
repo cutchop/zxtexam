@@ -20,6 +20,7 @@ public class ActionManager {
 	private int _timeout = 0;
 	private int _range = 0;
 	private int _delay = 0;
+	private int _delaymeter = 0;//延迟距离
 	private static int DEFTIMEOUT = 300;// 默认300秒
 	private static int DEFRANGE = 30000;// 默认30公里
 
@@ -33,6 +34,10 @@ public class ActionManager {
 
 	public void setDelay(int d) {
 		_delay = d;
+	}
+	
+	public void setDelaymeter(int d) {
+		_delaymeter = d;
 	}
 
 	public void setRange(int r) {
@@ -89,6 +94,11 @@ public class ActionManager {
 			_timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
+					if(_delaymeter > 0)
+					{
+						_delaymeter -= (_md.getData(21) * 1000 / 3600);
+						return;
+					}
 					if (TotalPoints < 90) {
 						Stop();
 						return;
@@ -96,8 +106,7 @@ public class ActionManager {
 					if (_timeout > 0) {
 						if (_timeout % (1000 / Metadata.PERIOD) == 0) {
 							if (_md != null) {
-								_range = _range
-										- (_md.getData(21) * 1000 / 3600);
+								_range -= (_md.getData(21) * 1000 / 3600);
 							}
 						}
 						_timeout--;

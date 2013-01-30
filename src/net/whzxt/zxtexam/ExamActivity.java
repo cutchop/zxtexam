@@ -262,7 +262,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i, j;
 		i = j = 0;
 		if (cursor.moveToFirst()) {
@@ -280,6 +280,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				} else {
 					map.put("delay", cursor.getInt(cursor.getColumnIndex("delay")));
 				}
+				if (cursor.getInt(cursor.getColumnIndex("delaymeter")) == 0) {
+					map.put("delaymeter", cursor.getInt(cursor.getColumnIndex("delaymeterdef")));
+				} else {
+					map.put("delaymeter", cursor.getInt(cursor.getColumnIndex("delaymeter")));
+				}
 				if (cursor.getInt(cursor.getColumnIndex("gpsrange")) == 0) {
 					map.put("gpsrange", md.getRange());
 				} else {
@@ -290,7 +295,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				} else {
 					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeout")));
 				}
-				if (cursor.getInt(cursor.getColumnIndex("timeout")) == 0) {
+				if (cursor.getInt(cursor.getColumnIndex("range")) == 0) {
 					map.put("range", cursor.getInt(cursor.getColumnIndex("rangedef")));
 				} else {
 					map.put("range", cursor.getInt(cursor.getColumnIndex("range")));
@@ -558,8 +563,9 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			txtCurrentName.setText(String.valueOf(index + 1) + ":" + itemAllList.get(index).get("itemname").toString());
 			actionManager.setMetadata(md);
 			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
+			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index).get("delaymeter").toString()));
 			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index).get("timeout").toString()));
-			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("gpsrange").toString()));
+			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("range").toString()));
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
 			actionManager.Start();
