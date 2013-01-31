@@ -14,6 +14,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -293,6 +294,12 @@ public class DetectActivity extends SerialPortActivity {
 		return false;
 	}
 
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
+	}
+	
 	@Override
 	protected void destroy() {
 		super.destroy();

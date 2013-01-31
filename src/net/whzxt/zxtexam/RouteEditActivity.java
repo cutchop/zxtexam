@@ -1,9 +1,7 @@
 package net.whzxt.zxtexam;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,12 +34,11 @@ public class RouteEditActivity extends Activity {
 	private Button btnName, btnTts;
 	private ListView listView;
 	private RadioButton radAutoTrue, radAutoFalse;
+	private RadioButton radStopTrue;
 	private Metadata md;
 	private int routeid;
 	private List<String> data;
-	private Map<String, Integer> map;
-	private Map<Integer, Integer> mapItems;
-	private String[] strItems;
+	private List<Integer> itemids;
 	private LocationManager locationManager;
 
 	@Override
@@ -55,6 +53,7 @@ public class RouteEditActivity extends Activity {
 		listView = (ListView) findViewById(R.id.listView1);
 		radAutoFalse = (RadioButton) findViewById(R.id.radAutoFalse);
 		radAutoTrue = (RadioButton) findViewById(R.id.radAutoTrue);
+		radStopTrue = (RadioButton) findViewById(R.id.radStopTrue);
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
 
@@ -64,6 +63,7 @@ public class RouteEditActivity extends Activity {
 				txtName.setText(cursor.getString(cursor.getColumnIndex("name")));
 				txtTts.setText(cursor.getString(cursor.getColumnIndex("tts")));
 				radAutoFalse.setChecked(cursor.getInt(cursor.getColumnIndex("auto")) == 0);
+				radStopTrue.setChecked(cursor.getInt(cursor.getColumnIndex("errstop")) == 1);
 			}
 			cursor.close();
 		} else {
@@ -78,6 +78,13 @@ public class RouteEditActivity extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (routeid > -1) {
 					md.execSQL("update " + DBer.T_ROUTE + " set auto=" + (radAutoTrue.isChecked() ? 1 : 0) + " where routeid=" + routeid);
+				}
+			}
+		});
+		radStopTrue.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (routeid > -1) {
+					md.execSQL("update " + DBer.T_ROUTE + " set errstop=" + (radStopTrue.isChecked() ? 1 : 0) + " where routeid=" + routeid);
 				}
 			}
 		});
@@ -135,24 +142,11 @@ public class RouteEditActivity extends Activity {
 		});
 
 		data = new ArrayList<String>();
-		map = new HashMap<String, Integer>();
-		mapItems = new HashMap<Integer, Integer>();
+		itemids = new ArrayList<Integer>();
 
-		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
-		if (cursor.moveToFirst()) {
-			strItems = new String[cursor.getCount()];
-			int i = 0;
-			do {
-				strItems[i] = cursor.getString(cursor.getColumnIndex("name"));
-				mapItems.put(i, cursor.getInt(cursor.getColumnIndex("itemid")));
-				i++;
-			} while (cursor.moveToNext());
-		}
-		cursor.close();
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
-				final String itemname = data.get(arg2);
-				if (map.get(itemname) == null) {
+				if (arg2 == data.size() - 1) {
 					if (routeid == -1) {
 						Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
 					} else {
@@ -184,36 +178,35 @@ public class RouteEditActivity extends Activity {
 				} else {
 					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setItems(new String[] { "上移", "下移", "修改", "删除" }, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
+							int itemid = itemids.get(arg2);
+							int xuhao = arg2 + 1;
 							if (which < 3) {
-								Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-								if (cursor.moveToFirst()) {
-									int xuhao = cursor.getInt(cursor.getColumnIndex("xuhao"));
-									if (which == 0) {
-										if (arg2 > 0) {
-											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao - 1));
-											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao - 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-											load();
-										}
-									} else if (which == 1) {
-										if (arg2 < data.size() - 2) {
-											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao + 1));
-											md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao + 1) + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
-											load();
-										}
-									} else{
-										Intent intent = new Intent();
-										Bundle bundle = new Bundle();
-										bundle.putInt("routeid", routeid);
-										bundle.putInt("itemid", map.get(itemname));
-										bundle.putInt("xuhao", xuhao);
-										intent.putExtras(bundle);
-										intent.setClass(RouteEditActivity.this, RouteItemEditActivity.class);
-										startActivityForResult(intent, 0);
+								if (which == 0) {
+									if (arg2 > 0) {
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=-1 where routeid=" + routeid + " and xuhao=" + xuhao);
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao - 1));
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao - 1) + " where routeid=" + routeid + " and xuhao=-1");
+										load();
 									}
+								} else if (which == 1) {
+									if (arg2 < data.size() - 2) {
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=-1 where routeid=" + routeid + " and xuhao=" + xuhao);
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + xuhao + " where routeid=" + routeid + " and xuhao=" + (xuhao + 1));
+										md.execSQL("update " + DBer.T_ROUTE_ITEM + " set xuhao=" + (xuhao + 1) + " where routeid=" + routeid + " and xuhao=-1");
+										load();
+									}
+								} else {
+									Intent intent = new Intent();
+									Bundle bundle = new Bundle();
+									bundle.putInt("routeid", routeid);
+									bundle.putInt("itemid", itemid);
+									bundle.putInt("xuhao", xuhao);
+									intent.putExtras(bundle);
+									intent.setClass(RouteEditActivity.this, RouteItemEditActivity.class);
+									startActivityForResult(intent, 0);
 								}
-								cursor.close();
 							} else {
-								md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + map.get(itemname));
+								md.execSQL("delete from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 								load();
 							}
 						}
@@ -231,14 +224,14 @@ public class RouteEditActivity extends Activity {
 
 	private void load() {
 		data.clear();
-		map.clear();
+		itemids.clear();
 		Cursor cursor = md.rawQuery("select a.itemid,b.name from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i = 0;
 		if (cursor.moveToFirst()) {
 			do {
 				i++;
 				data.add("(" + i + ")" + cursor.getString(cursor.getColumnIndex("name")));
-				map.put("(" + i + ")" + cursor.getString(cursor.getColumnIndex("name")), cursor.getInt(cursor.getColumnIndex("itemid")));
+				itemids.add(cursor.getInt(cursor.getColumnIndex("itemid")));
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
@@ -263,6 +256,7 @@ public class RouteEditActivity extends Activity {
 		Bundle bundle = new Bundle();
 		bundle.putInt("routeid", routeid);
 		bundle.putInt("xuhao", xuhao);
+		bundle.putInt("itemid", 0);
 		intent.putExtras(bundle);
 		intent.setClass(RouteEditActivity.this, RouteItemEditActivity.class);
 		startActivityForResult(intent, 0);
@@ -296,6 +290,12 @@ public class RouteEditActivity extends Activity {
 			// Provider的转态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
 		}
 	};
+
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
+	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

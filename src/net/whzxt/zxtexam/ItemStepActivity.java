@@ -14,6 +14,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.InputType;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 
 public class ItemStepActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 
@@ -248,6 +249,12 @@ public class ItemStepActivity extends PreferenceActivity implements OnPreference
 		return false;
 	}
 
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
+	}
+	
 	private void exit() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();

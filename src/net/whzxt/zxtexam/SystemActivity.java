@@ -15,6 +15,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.text.InputType;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 public class SystemActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
@@ -148,7 +149,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ITEM);
-					sBuffer.append("(itemid, name, tts, timeout, type, xuhao, endtts, range, delay) VALUES (");
+					sBuffer.append("(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
 					sBuffer.append(",");
 					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
@@ -166,6 +167,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("range")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delay")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delaymeter")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
@@ -192,7 +195,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE);
-					sBuffer.append("(routeid, name, tts, auto) VALUES (");
+					sBuffer.append("(routeid, name, tts, auto, errstop) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
 					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("name")) + "'");
@@ -200,6 +203,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append("'" + cursor.getString(cursor.getColumnIndex("tts")) + "'");
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("auto")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("errstop")));
 					sBuffer.append(")\");\n");
 				} while (cursor.moveToNext());
 			}
@@ -209,7 +214,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE_ITEM);
-					sBuffer.append("(routeid, itemid, lon, lat, gpsrange, timeout, delay, range, xuhao) VALUES (");
+					sBuffer.append("(routeid, itemid, lon, lat, gpsrange, timeout, delay, delaymeter, range, xuhao) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
@@ -223,6 +228,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("timeout")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delay")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("delaymeter")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("range")));
 					sBuffer.append(",");
@@ -266,6 +273,12 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 
 }

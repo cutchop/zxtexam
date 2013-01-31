@@ -73,7 +73,10 @@ public final class R {
         public static final int listView1=0x7f0a0001;
         public static final int radAutoFalse=0x7f0a0031;
         public static final int radAutoTrue=0x7f0a0030;
+        public static final int radStopFalse=0x7f0a0033;
+        public static final int radStopTrue=0x7f0a0034;
         public static final int radioGroup1=0x7f0a002f;
+        public static final int radioGroup2=0x7f0a0032;
         public static final int tableRow1=0x7f0a0002;
         public static final int tableRow2=0x7f0a0006;
         public static final int tableRow3=0x7f0a000b;

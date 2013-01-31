@@ -28,13 +28,13 @@ public class Metadata extends Application {
 	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
 	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
-	private static final int DEF_RANGE = 50;
+	private static final int DEF_RANGE = 60;
 	private static final String DEF_SERIAL = "/dev/ttyS1";
 	private static final String DEF_BAUDRATE = "115200";
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 58;
+	private static final int DBVERSION = 62;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -103,7 +103,7 @@ public class Metadata extends Application {
 			return;
 		}
 		if (id == 31) {
-			gpsangle = val;
+			gpsangle = Math.round(val * getGpsAngleXS());
 		}
 	}
 
@@ -117,6 +117,10 @@ public class Metadata extends Application {
 
 	public float getGpsSpeedXS() {
 		return Float.parseFloat(settings.getString("gpsspeedxs", "1"));
+	}
+
+	public float getGpsAngleXS() {
+		return Float.parseFloat(settings.getString("gpsanglexs", "1"));
 	}
 
 	public void setGPSLatlon(float lat, float lon) {

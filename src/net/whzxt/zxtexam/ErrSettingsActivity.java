@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -160,5 +161,11 @@ public class ErrSettingsActivity extends Activity {
 		}
 		cursor.close();
 		listView.setAdapter(new SimpleAdapter(this, data, android.R.layout.simple_expandable_list_item_2, new String[] { "name", "fenshu" }, new int[] { android.R.id.text1, android.R.id.text2 }));
+	}
+
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 }

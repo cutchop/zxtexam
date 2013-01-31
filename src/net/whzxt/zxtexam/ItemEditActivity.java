@@ -18,6 +18,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -281,6 +282,12 @@ public class ItemEditActivity extends PreferenceActivity implements OnPreference
 		return false;
 	}
 
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
+	}
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {

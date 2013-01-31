@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.view.WindowManager;
 import android.app.Activity;
 import android.content.Intent;
 
@@ -61,5 +62,11 @@ public class WelcomeActivity extends Activity implements OnInitListener {
 			checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
 			startActivityForResult(checkIntent, REQ_TTS_STATUS_CHECK);
 		}
+	}
+	
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 }

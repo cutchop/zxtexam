@@ -7,6 +7,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
+import android.view.WindowManager;
 
 public class ItemsActivity extends PreferenceActivity implements OnPreferenceClickListener {
 
@@ -63,5 +64,11 @@ public class ItemsActivity extends PreferenceActivity implements OnPreferenceCli
 		default:
 			break;
 		}
+	}
+	
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 }

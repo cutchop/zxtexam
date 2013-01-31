@@ -13,6 +13,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.text.InputType;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 
 public class RouteItemEditActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 
@@ -113,7 +114,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			if(newValue.toString().equals("")){
 				return false;
 			}
-			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set gpsrange=" + newValue + " where routeid=" + routeid + " and xuhao=" + xuhao);
+			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set gpsrange=" + newValue + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 			if(newValue.toString().equals("0")){
 				preference.setSummary("使用默认值");
 			}else{
@@ -125,7 +126,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			if(newValue.toString().equals("")){
 				return false;
 			}
-			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set timeout=" + newValue + " where routeid=" + routeid + " and xuhao=" + xuhao);
+			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set timeout=" + newValue + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 			if(newValue.toString().equals("0")){
 				preference.setSummary("使用默认值");
 			}else{
@@ -137,7 +138,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			if(newValue.toString().equals("")){
 				return false;
 			}
-			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set delay=" + newValue + " where routeid=" + routeid + " and xuhao=" + xuhao);
+			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set delay=" + newValue + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 			if(newValue.toString().equals("0")){
 				preference.setSummary("使用默认值");
 			}else{
@@ -149,7 +150,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			if(newValue.toString().equals("")){
 				return false;
 			}
-			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set delaymeter=" + newValue + " where routeid=" + routeid + " and xuhao=" + xuhao);
+			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set delaymeter=" + newValue + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 			if(newValue.toString().equals("0")){
 				preference.setSummary("使用默认值");
 			}else{
@@ -161,7 +162,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			if(newValue.toString().equals("")){
 				return false;
 			}
-			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set range=" + newValue + " where routeid=" + routeid + " and xuhao=" + xuhao);
+			md.execSQL("update " + DBer.T_ROUTE_ITEM + " set range=" + newValue + " where routeid=" + routeid + " and itemid=" + itemid + " and xuhao=" + xuhao);
 			if(newValue.toString().equals("0")){
 				preference.setSummary("使用默认值");
 			}else{
@@ -178,6 +179,12 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 			RouteItemEditActivity.this.finish();
 		}
 		return false;
+	}
+	
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 
 	@Override

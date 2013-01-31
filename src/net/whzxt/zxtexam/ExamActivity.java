@@ -68,6 +68,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private int currId = 0;
 	private ActionManager actionManager;
 	private Boolean isAuto = false;
+	private Boolean isErrStop = false;
 	private Boolean needCheckLight = false;
 	private Boolean needCheckDevice = false;
 	private int checkdeviceTimeout = 10;
@@ -201,7 +202,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						txtCurrentName.setText("");
 					}
 				});
-				if (fenshu >= 90) {
+				if (fenshu >= 90 || !isErrStop) {
 					if (isAuto) {
 						startMatch = true;
 						if (currId < itemAllList.size() - 1) {
@@ -259,6 +260,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		if (cursor.moveToFirst()) {
 			routeTts = cursor.getString(cursor.getColumnIndex("tts"));
 			isAuto = (cursor.getInt(cursor.getColumnIndex("auto")) == 1);
+			isErrStop = (cursor.getInt(cursor.getColumnIndex("errstop")) == 1);
 		}
 		cursor.close();
 		// ITEMS
@@ -289,6 +291,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					map.put("gpsrange", md.getRange());
 				} else {
 					map.put("gpsrange", cursor.getInt(cursor.getColumnIndex("gpsrange")));
+					Log.i("exam", String.valueOf(cursor.getInt(cursor.getColumnIndex("gpsrange"))));
 				}
 				if (cursor.getInt(cursor.getColumnIndex("timeout")) == 0) {
 					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeoutdef")));
@@ -324,10 +327,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					if (needCheckLight) {
 						speak("请关闭所有灯光，准备考试");
 					} else {
-						if (fenshu < 90) {
-							delAllListItem();
+						if (isErrStop) {
+							speak("考试不合格");
+						} else {
+							handler.sendEmptyMessage(arg2);
 						}
-						handler.sendEmptyMessage(arg2);
 					}
 				}
 			}
@@ -606,7 +610,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				md.setGPSSpeed(location.getSpeed());
 				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
-				if (startMatch && fenshu >= 90 && !actionManager.IsRunning && location.getLatitude() != 0) {
+				if (startMatch && !actionManager.IsRunning && location.getLatitude() != 0) {
 					for (int i = 0; i < itemAllList.size(); i++) {
 						if (Float.parseFloat(itemAllList.get(i).get("lat").toString()) != 0f) {
 							Location loa = new Location("reverseGeocoded");
@@ -768,6 +772,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			return null;
 		}
 		return dialog;
+	}
+
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 
 	@Override

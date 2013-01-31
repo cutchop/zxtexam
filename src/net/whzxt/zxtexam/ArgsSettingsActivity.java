@@ -7,6 +7,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.text.InputType;
+import android.view.WindowManager;
 
 public class ArgsSettingsActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 	private Metadata md;
@@ -32,6 +33,11 @@ public class ArgsSettingsActivity extends PreferenceActivity implements OnPrefer
 		// GPS速度修正系数
 		preference = findPreference("gpsspeedxs");
 		preference.setTitle("GPS速度修正系数：" + md.getGpsSpeedXS());
+		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		preference.setOnPreferenceChangeListener(this);
+		// GPS角度修正系数
+		preference = findPreference("gpsanglexs");
+		preference.setTitle("GPS角度修正系数：" + md.getGpsAngleXS());
 		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		preference.setOnPreferenceChangeListener(this);
 		// GPS阈值
@@ -79,6 +85,16 @@ public class ArgsSettingsActivity extends PreferenceActivity implements OnPrefer
 				return false;
 			}
 			preference.setTitle("GPS速度修正系数：" + newValue);
+		} else if (preference.getKey().equals("gpsanglexs")) {
+			if (newValue.toString().trim().equals("")) {
+				return false;
+			}
+			try {
+				Float.parseFloat(newValue.toString());
+			} catch (NumberFormatException e) {
+				return false;
+			}
+			preference.setTitle("GPS角度修正系数：" + newValue);
 		} else if (preference.getKey().equals("range")) {
 			if (newValue.toString().trim().equals("")) {
 				return false;
@@ -92,5 +108,11 @@ public class ArgsSettingsActivity extends PreferenceActivity implements OnPrefer
 			preference.setSummary(newValue.toString().equals("0") ? "串口" : "无线");
 		}
 		return true;
+	}
+
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
 	}
 }
