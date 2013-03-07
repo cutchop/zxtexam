@@ -264,7 +264,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join "
+				+ DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i, j;
 		i = j = 0;
 		if (cursor.moveToFirst()) {
@@ -327,7 +328,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					if (needCheckLight) {
 						speak("请关闭所有灯光，准备考试");
 					} else {
-						if (isErrStop) {
+						if (isErrStop && fenshu < 90) {
 							speak("考试不合格");
 						} else {
 							handler.sendEmptyMessage(arg2);
@@ -564,7 +565,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				list.add(action);
 			} while (cursor.moveToNext());
 			cursor.close();
-			txtCurrentName.setText(String.valueOf(index + 1) + ":" + itemAllList.get(index).get("itemname").toString());
+			String nString = itemAllList.get(index).get("itemname").toString();
+			if (nString.length() > 4) {
+				nString = nString.substring(0, 3) + "...";
+			}
+			txtCurrentName.setText(String.valueOf(index + 1) + ":" + nString);
 			actionManager.setMetadata(md);
 			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
 			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index).get("delaymeter").toString()));
