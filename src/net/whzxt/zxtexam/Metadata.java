@@ -34,7 +34,7 @@ public class Metadata extends Application {
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 63;
+	private static final int DBVERSION = 65;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -103,7 +103,8 @@ public class Metadata extends Application {
 			return;
 		}
 		if (id == 31) {
-			gpsangle = Math.round(val * getGpsAngleXS());
+			gpsangle = val;
+			//gpsangle = Math.round(val * getGpsAngleXS());
 		}
 	}
 
@@ -119,9 +120,11 @@ public class Metadata extends Application {
 		return Float.parseFloat(settings.getString("gpsspeedxs", "1"));
 	}
 
+	/*
 	public float getGpsAngleXS() {
 		return Float.parseFloat(settings.getString("gpsanglexs", "1"));
 	}
+	*/
 
 	public void setGPSLatlon(float lat, float lon) {
 		this.lat = lat;

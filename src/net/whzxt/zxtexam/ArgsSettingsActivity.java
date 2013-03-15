@@ -36,10 +36,10 @@ public class ArgsSettingsActivity extends PreferenceActivity implements OnPrefer
 		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
 		preference.setOnPreferenceChangeListener(this);
 		// GPS角度修正系数
-		preference = findPreference("gpsanglexs");
-		preference.setTitle("GPS角度修正系数：" + md.getGpsAngleXS());
-		((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-		preference.setOnPreferenceChangeListener(this);
+		//preference = findPreference("gpsanglexs");
+		//preference.setTitle("GPS角度修正系数：" + md.getGpsAngleXS());
+		//((EditTextPreference) preference).getEditText().setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		//preference.setOnPreferenceChangeListener(this);
 		// GPS阈值
 		preference = findPreference("range");
 		preference.setTitle("阈值：" + md.getRange());

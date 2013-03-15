@@ -106,9 +106,10 @@ public class RouteEditActivity extends Activity {
 						cursor.close();
 						if (routeid > -1) {
 							routeid++;
-							md.execSQL("insert into " + DBer.T_ROUTE + "(routeid,name,tts,auto) values(" + routeid + ",'" + txtName.getText() + "','',1)");
+							md.execSQL("insert into " + DBer.T_ROUTE + "(routeid,name,tts,auto) values(" + routeid + ",'" + txtName.getText() + "','当前路线为" + txtName.getText() + "',1)");
 							btnName.setText("修改");
 							txtName.setEnabled(false);
+							txtTts.setText("当前路线为" + txtName.getText());
 						} else {
 							Toast.makeText(RouteEditActivity.this, "路线保存失败", Toast.LENGTH_SHORT).show();
 						}
@@ -116,6 +117,10 @@ public class RouteEditActivity extends Activity {
 						md.execSQL("update " + DBer.T_ROUTE + " set name='" + txtName.getText() + "' where routeid=" + routeid);
 						btnName.setText("修改");
 						txtName.setEnabled(false);
+						if (txtTts.getText().toString().trim().equals("")) {
+							md.execSQL("update " + DBer.T_ROUTE + " set tts='当前路线为" + txtName.getText() + "' where routeid=" + routeid);
+							txtTts.setText("当前路线为" + txtName.getText());
+						}
 					}
 				}
 			}
@@ -248,9 +253,9 @@ public class RouteEditActivity extends Activity {
 		cursor.close();
 		if (bindLatlon) {
 			float[] latlon = md.getLatlon();
-			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,xuhao) values(" + routeid + ",0," + latlon[1] + "," + latlon[0] + "," + xuhao + ")");
+			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + ",0," + latlon[1] + "," + latlon[0] + "," + md.getData(31) + "," + xuhao + ")");
 		} else {
-			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,xuhao) values(" + routeid + ",0,0,0," + xuhao + ")");
+			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + ",0,0,0,0," + xuhao + ")");
 		}
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();

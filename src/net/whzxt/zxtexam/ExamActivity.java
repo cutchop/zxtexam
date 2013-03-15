@@ -264,7 +264,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join "
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.angle,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join "
 				+ DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i, j;
 		i = j = 0;
@@ -278,6 +278,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				map.put("endtts", cursor.getString(cursor.getColumnIndex("endtts")));
 				map.put("lon", cursor.getFloat(cursor.getColumnIndex("lon")));
 				map.put("lat", cursor.getFloat(cursor.getColumnIndex("lat")));
+				map.put("angle", cursor.getInt(cursor.getColumnIndex("angle")));
 				if (cursor.getInt(cursor.getColumnIndex("delay")) == 0) {
 					map.put("delay", cursor.getInt(cursor.getColumnIndex("delaydef")));
 				} else {
@@ -623,10 +624,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
 							if (location.distanceTo(loa) <= Integer.parseInt(itemAllList.get(i).get("gpsrange").toString())) {
 								if (itemAllList.get(i).get("over").toString().equals("0")) {
-									startMatch = false;
-									itemAllList.get(i).put("over", "1");
-									handler.sendEmptyMessage(i);
-									break;
+									if (isAngleInRange(Integer.parseInt(itemAllList.get(i).get("angle").toString()), md.getData(31), 30)) {
+										startMatch = false;
+										itemAllList.get(i).put("over", "1");
+										handler.sendEmptyMessage(i);
+										break;
+									}
 								}
 							} else {
 								itemAllList.get(i).put("over", "0");
@@ -649,6 +652,32 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			// Provider的转态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
 		}
 	};
+
+	private Boolean isAngleInRange(int x, int y, int r) {
+		if (x == 0) {
+			return true;
+		}
+		if (x < r) {
+			if (y < x + r) {
+				return true;
+			}
+			if (y > 360 - r + x) {
+				return true;
+			}
+		} else if (x > 360 - r) {
+			if (y > x - r) {
+				return true;
+			}
+			if (y < r - 360 + x) {
+				return true;
+			}
+		} else {
+			if (y < x + r && y > x - r) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private String getTimeDiff(Date start, Date end) {
 		int between = (int) (end.getTime() - start.getTime()) / 1000;

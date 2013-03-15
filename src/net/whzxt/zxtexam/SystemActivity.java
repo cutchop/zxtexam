@@ -214,7 +214,7 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 				do {
 					sBuffer.append("db.execSQL(\"INSERT INTO ");
 					sBuffer.append(DBer.T_ROUTE_ITEM);
-					sBuffer.append("(routeid, itemid, lon, lat, gpsrange, timeout, delay, delaymeter, range, xuhao) VALUES (");
+					sBuffer.append("(routeid, itemid, lon, lat, angle, gpsrange, timeout, delay, delaymeter, range, xuhao) VALUES (");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("routeid")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("itemid")));
@@ -222,6 +222,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lon")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getFloat(cursor.getColumnIndex("lat")));
+					sBuffer.append(",");
+					sBuffer.append(cursor.getInt(cursor.getColumnIndex("angle")));
 					sBuffer.append(",");
 					sBuffer.append(cursor.getInt(cursor.getColumnIndex("gpsrange")));
 					sBuffer.append(",");
