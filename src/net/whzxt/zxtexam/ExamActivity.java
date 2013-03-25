@@ -79,6 +79,9 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private final int DL_CONNECTING = 0x02;
 	private final int DL_CHECKDEVICESTATUS = 0x03;
 	private int mile = 0;
+	private Boolean deteFlameout = false;
+	private Timer _timerDeteFlameout;
+	private int gpsrangeCorr = 0;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -197,6 +200,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		actionManager = new ActionManager();
 		actionManager.setOnStatusChange(new ActionManager.OnStatusChange() {
 			public void onStop() {
+				gpsrangeCorr = 0;
 				runOnUiThread(new Runnable() {
 					public void run() {
 						txtCurrentName.setText("");
@@ -241,7 +245,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						map.put("itemname", actionManager.getAction(list.get(i)).Itemname);
 						map.put("fenshu", String.valueOf(actionManager.getAction(list.get(i)).Fenshu));
 						map.put("errname", actionManager.getAction(list.get(i)).Err);
-						errList.add(map);
+						errList.add(0, map);
 						fenshu -= actionManager.getAction(list.get(i)).Fenshu;
 					}
 				}
@@ -264,8 +268,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.angle,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join "
-				+ DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.angle,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i, j;
 		i = j = 0;
 		if (cursor.moveToFirst()) {
@@ -414,7 +417,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 									map.put("itemname", tmpitemname);
 									map.put("fenshu", fenshus[which]);
 									map.put("errname", errnames[which]);
-									errList.add(map);
+									errList.add(0, map);
 									fenshu -= Integer.parseInt(fenshus[which]);
 									if (fenshu < 0) {
 										fenshu = 0;
@@ -542,6 +545,37 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 		}
+
+		// 检测考试过程中熄火
+		_timerDeteFlameout = new Timer();
+		_timerDeteFlameout.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (deteFlameout) {
+					if (md.getData(20) == 0) {
+						deteFlameout = false;
+						HashMap<String, String> map = new HashMap<String, String>();
+						map.put("itemname", "考试");
+						map.put("fenshu", "10");
+						map.put("errname", "考试过程中熄火");
+						errList.add(0, map);
+						fenshu -= 10;
+						if (fenshu < 0) {
+							fenshu = 0;
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								refreshListView();
+							}
+						});
+					}
+				} else {
+					if (md.getData(20) > 100) {
+						deteFlameout = true;
+					}
+				}
+			}
+		}, 1000, 1000);
 	}
 
 	private void execItem(int index) {
@@ -575,7 +609,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
 			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index).get("delaymeter").toString()));
 			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index).get("timeout").toString()));
-			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("range").toString()));
+			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("range").toString()) - gpsrangeCorr);
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
 			actionManager.Start();
@@ -622,11 +656,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 							Location loa = new Location("reverseGeocoded");
 							loa.setLatitude(Double.parseDouble(itemAllList.get(i).get("lat").toString()));
 							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
-							if (location.distanceTo(loa) <= Integer.parseInt(itemAllList.get(i).get("gpsrange").toString())) {
+							float dis = location.distanceTo(loa);
+							if (dis <= Integer.parseInt(itemAllList.get(i).get("gpsrange").toString())) {
 								if (itemAllList.get(i).get("over").toString().equals("0")) {
 									if (isAngleInRange(Integer.parseInt(itemAllList.get(i).get("angle").toString()), md.getData(31), 30)) {
 										startMatch = false;
 										itemAllList.get(i).put("over", "1");
+										gpsrangeCorr = Integer.parseInt(itemAllList.get(i).get("gpsrange").toString()) - Math.round(dis);
 										handler.sendEmptyMessage(i);
 										break;
 									}

@@ -38,8 +38,10 @@ public class RouteEditActivity extends Activity {
 	private Metadata md;
 	private int routeid;
 	private List<String> data;
-	private List<Integer> itemids;
+	private List<Integer> itemids,xuhaos;
 	private LocationManager locationManager;
+	private static Integer[] itemids_0 = { 1, 2, 40, 6, 7, 39, 21, 9, 8, 41, 42, 43 };
+	private static Integer[] itemids_1 = { 38, 4, 36, 23, 37, 24, 5, 25, 26, 39 };
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,11 +107,18 @@ public class RouteEditActivity extends Activity {
 						}
 						cursor.close();
 						if (routeid > -1) {
+							if (routeid < 50) {
+								routeid = 50;
+							}
 							routeid++;
 							md.execSQL("insert into " + DBer.T_ROUTE + "(routeid,name,tts,auto) values(" + routeid + ",'" + txtName.getText() + "','当前路线为" + txtName.getText() + "',1)");
+							for (int i = 0; i < itemids_0.length; i++) {
+								md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + "," + itemids_0[i] + ",0,0,0," + (i + 1) + ")");
+							}
 							btnName.setText("修改");
 							txtName.setEnabled(false);
 							txtTts.setText("当前路线为" + txtName.getText());
+							load();
 						} else {
 							Toast.makeText(RouteEditActivity.this, "路线保存失败", Toast.LENGTH_SHORT).show();
 						}
@@ -148,6 +157,7 @@ public class RouteEditActivity extends Activity {
 
 		data = new ArrayList<String>();
 		itemids = new ArrayList<Integer>();
+		xuhaos = new ArrayList<Integer>();
 
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
@@ -156,35 +166,16 @@ public class RouteEditActivity extends Activity {
 						Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
 					} else {
 						if (md.getLatlon()[0] != 0) {
-							String[] strs = { "绑定当前位置:" + md.getLatLonString(), "不绑定位置信息" };
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("是否要绑定位置信息?").setIcon(android.R.drawable.ic_menu_help).setItems(strs, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									add(which == 0);
-								}
-							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									return;
-								}
-							}).create();
-							alertDialog.show();
+							add();
 						} else {
-							AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("没有获取到位置信息,请检查GPS").setMessage("添加的项目将不会绑定位置信息，是否继续?").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("继续", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									add(false);
-								}
-							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									return;
-								}
-							}).create();
-							alertDialog.show();
+							Toast.makeText(RouteEditActivity.this, "正在等待GPS定位,请稍候...", Toast.LENGTH_SHORT).show();
 						}
 					}
 				} else {
 					AlertDialog alertDialog = new AlertDialog.Builder(RouteEditActivity.this).setTitle("请选择操作").setIcon(android.R.drawable.ic_menu_help).setItems(new String[] { "上移", "下移", "修改", "删除" }, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							int itemid = itemids.get(arg2);
-							int xuhao = arg2 + 1;
+							int xuhao = xuhaos.get(arg2);
 							if (which < 3) {
 								if (which == 0) {
 									if (arg2 > 0) {
@@ -230,13 +221,15 @@ public class RouteEditActivity extends Activity {
 	private void load() {
 		data.clear();
 		itemids.clear();
-		Cursor cursor = md.rawQuery("select a.itemid,b.name from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		xuhaos.clear();
+		Cursor cursor = md.rawQuery("select a.itemid,b.name,a.xuhao from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
 		int i = 0;
 		if (cursor.moveToFirst()) {
 			do {
 				i++;
 				data.add("(" + i + ")" + cursor.getString(cursor.getColumnIndex("name")));
 				itemids.add(cursor.getInt(cursor.getColumnIndex("itemid")));
+				xuhaos.add(cursor.getInt(cursor.getColumnIndex("xuhao")));
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
@@ -244,19 +237,15 @@ public class RouteEditActivity extends Activity {
 		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
 	}
 
-	private void add(Boolean bindLatlon) {
+	private void add() {
 		int xuhao = 1;
 		Cursor cursor = md.rawQuery("select xuhao from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " order by xuhao desc");
 		if (cursor.moveToFirst()) {
 			xuhao = cursor.getInt(0) + 1;
 		}
 		cursor.close();
-		if (bindLatlon) {
-			float[] latlon = md.getLatlon();
-			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + ",0," + latlon[1] + "," + latlon[0] + "," + md.getData(31) + "," + xuhao + ")");
-		} else {
-			md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + ",0,0,0,0," + xuhao + ")");
-		}
+		float[] latlon = md.getLatlon();
+		md.execSQL("insert into " + DBer.T_ROUTE_ITEM + "(routeid,itemid,lon,lat,angle,xuhao) values(" + routeid + ",5," + latlon[1] + "," + latlon[0] + "," + (md.getData(31) + 1) + "," + xuhao + ")");
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 		bundle.putInt("routeid", routeid);

@@ -28,13 +28,13 @@ public class Metadata extends Application {
 	private static final String[] DEF_MAICHONG_NAME = { "转速", "速度" };
 	private static final float[] DEF_MAICHONG_XS = { 30f, 0.75f };// 脉冲修正系数
 	private static final String DEF_PASSWORD = "027";
-	private static final int DEF_RANGE = 60;
+	private static final int DEF_RANGE = 30;//默认阈值
 	private static final String DEF_SERIAL = "/dev/ttyS1";
-	private static final String DEF_BAUDRATE = "115200";
+	private static final String DEF_BAUDRATE = "9600";
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 65;
+	private static final int DBVERSION = 68;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;

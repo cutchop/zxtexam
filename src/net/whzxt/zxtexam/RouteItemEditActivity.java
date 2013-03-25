@@ -37,7 +37,7 @@ public class RouteItemEditActivity extends PreferenceActivity implements OnPrefe
 		xuhao = bundle.getInt("xuhao");
 		itemid = bundle.getInt("itemid");
 
-		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " order by type,xuhao");
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM + " where itemid in (38, 4, 36, 23, 37, 24, 5, 25, 26, 39) order by type,xuhao");
 		if (cursor.moveToFirst()) {
 			itemnames = new String[cursor.getCount()];
 			itemvalues = new String[cursor.getCount()];
