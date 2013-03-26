@@ -47,8 +47,8 @@ public class DBer extends SQLiteOpenHelper {
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (37,'前方路口右转语音提示','前方路口右转',0,0,17,'',0,0,0)");
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (24,'路口右转弯(无提示)','、',0,0,18,'',50,0,0)");
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (43,'路口右转弯','前方路口右转',0,0,18,'',50,0,0)");
-		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (9,'掉头','前方请选择合适地点掉头',150,0,19,'结束考试，请考官综合评判。',150,0,0)");
-		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (8,'靠边停车','请靠边停车',150,0,20,'',150,0,0)");
+		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (9,'掉头','前方请选择合适地点掉头',150,0,19,'',150,0,0)");
+		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (8,'靠边停车','请靠边停车',150,0,20,'结束考试，请考官综合评判。',150,0,0)");
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (11,'夜间在没有路灯、照明不良条件下行驶','夜间在没有路灯、照明不良条件下行驶',5,1,1,'',0,0,0)");
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (12,'请将前大灯换成远光','请将前大灯换成远光',5,1,2,'',0,0,0)");
 		db.execSQL("INSERT INTO zxt_item(itemid, name, tts, timeout, type, xuhao, endtts, range, delay, delaymeter) VALUES (13,'夜间同向近距离跟车行驶','夜间同向近距离跟车行驶',5,1,3,'',0,0,0)");

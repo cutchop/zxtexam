@@ -242,7 +242,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				if (list.size() > 0) {
 					for (int i = 0; i < list.size(); i++) {
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put("itemname", actionManager.getAction(list.get(i)).Itemname);
+						map.put("itemname", (actionManager.getCurrIndex() + 1) + "." + actionManager.getAction(list.get(i)).Itemname);
 						map.put("fenshu", String.valueOf(actionManager.getAction(list.get(i)).Fenshu));
 						map.put("errname", actionManager.getAction(list.get(i)).Err);
 						errList.add(0, map);
@@ -608,7 +608,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			if (nString.length() > 4) {
 				nString = nString.substring(0, 3) + "...";
 			}
-			txtCurrentName.setText(String.valueOf(index + 1) + ":" + nString);
+			txtCurrentName.setText(String.valueOf(index + 1) + "." + nString);
 			actionManager.setMetadata(md);
 			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
 			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index).get("delaymeter").toString()));
