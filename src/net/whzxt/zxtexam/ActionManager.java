@@ -14,6 +14,7 @@ public class ActionManager {
 
 	public Boolean IsRunning = false;
 	public int TotalPoints = 100; // 总分
+	private int currIndex = 0;
 	private Metadata _md;
 	private Timer _timer;
 	private int _step = 1;
@@ -31,6 +32,14 @@ public class ActionManager {
 			_timeout = t * (1000 / Metadata.PERIOD);
 		}
 	}
+	
+	public void setCurrIndex(int index) {
+		currIndex = index;
+	}
+	
+	public int getCurrIndex() {
+		return currIndex;
+	}
 
 	public void setDelay(int d) {
 		_delay = d;
@@ -41,7 +50,7 @@ public class ActionManager {
 	}
 
 	public void setRange(int r) {
-		if (r == 0) {
+		if (r <= 0) {
 			_range = DEFRANGE;
 		} else {
 			_range = r;

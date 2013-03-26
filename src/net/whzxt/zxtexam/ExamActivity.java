@@ -327,7 +327,11 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					arg2 = itemNoMap.get(arg2);
 				}
 				if (actionManager.IsRunning) {
-					Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
+					if (actionManager.getCurrIndex() == arg2) {
+						actionManager.Stop();
+					} else {
+						Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
+					}
 				} else {
 					if (needCheckLight) {
 						speak("请关闭所有灯光，准备考试");
@@ -612,6 +616,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("range").toString()) - gpsrangeCorr);
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
+			actionManager.setCurrIndex(index);
 			actionManager.Start();
 		}
 	}
