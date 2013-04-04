@@ -61,6 +61,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Timer _timer, _timerSerial;
 	private Date start;
 	private TextView txtRouteName, txtTime, txtDefen;
+	private TextView txtView6, txtView4, txtView5, txtView1;
 	private Button btnRgpp, btnStop;
 	private static final int REQ_TTS_STATUS_CHECK = 0;
 	private LocationManager locationManager;
@@ -150,7 +151,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void refreshListView() {
-		listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList));
+		listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList, md.isLargeText()));
 		txtDefen.setText(String.valueOf(fenshu));
 	}
 
@@ -188,11 +189,27 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		txtCurrentName = (TextView) findViewById(R.id.txtCurrentName);
 		layDefen = (LinearLayout) findViewById(R.id.layDefen);
 		txtMile = (TextView) findViewById(R.id.txtMile);
+		txtView1 = (TextView) findViewById(R.id.textView1);
+		txtView4 = (TextView) findViewById(R.id.textView4);
+		txtView5 = (TextView) findViewById(R.id.textView5);
+		txtView6 = (TextView) findViewById(R.id.textView6);
 		md = (Metadata) getApplication();
 		Bundle bundle = this.getIntent().getExtras();
 		routeid = bundle.getInt("routeid");
 		txtRouteName.setText("考试项目列表：(" + bundle.getString("routename") + ")");
 		fenshu = 100;
+		if (md.isLargeText()) {
+			txtView4.setTextSize(28);
+			txtView5.setTextSize(28);
+			txtView6.setTextSize(28);
+			txtTime.setTextSize(28);
+			txtRouteName.setTextSize(28);
+			txtMile.setTextSize(28);
+			txtView1.setTextSize(32);
+			txtDefen.setTextSize(32);
+			btnRgpp.setTextSize(32);
+			btnStop.setTextSize(32);
+		}
 		errList = new ArrayList<HashMap<String, String>>();
 		itemList = new ArrayList<HashMap<String, Object>>();
 		itemAllList = new ArrayList<HashMap<String, Object>>();
@@ -320,7 +337,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+		gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				if (cbHideAuto.isChecked()) {
@@ -429,7 +446,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 									if (fenshu < 90) {
 										speak("考试不合格,扣分项目为," + strs2[which]);
 									}
-									listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList));
+									listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList, md.isLargeText()));
 									txtDefen.setText(String.valueOf(fenshu));
 								}
 							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -460,9 +477,9 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		cbHideAuto.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
-					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
 				} else {
-					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemAllList, R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemAllList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
 				}
 			}
 		});
@@ -623,7 +640,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 
 	private void delListItem(int index) {
 		errList.remove(index);
-		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList);
+		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList, md.isLargeText());
 		listView.setAdapter(adapter);
 		fenshu = 100;
 		for (int i = 0; i < errList.size(); i++) {
@@ -641,7 +658,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private void delAllListItem() {
 		fenshu = 100;
 		errList.clear();
-		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList);
+		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList, md.isLargeText());
 		listView.setAdapter(adapter);
 		txtDefen.setText(String.valueOf(fenshu));
 		if (isAuto) {

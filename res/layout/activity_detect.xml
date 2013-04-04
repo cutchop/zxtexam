@@ -226,8 +226,9 @@
             android:orientation="horizontal" >
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.2"
                 android:orientation="vertical" >
 
                 <LinearLayout
@@ -237,9 +238,10 @@
 
                     <TextView
                         android:id="@+id/textView20"
-                        android:layout_width="200dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
+                        android:layout_weight="0.5"
                         android:background="@color/lighton"
                         android:padding="5dp"
                         android:text="脉冲1:"
@@ -248,14 +250,16 @@
 
                     <TextView
                         android:id="@+id/textView21"
-                        android:layout_width="200dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
+                        android:layout_weight="0.5"
                         android:background="@color/lighton"
                         android:padding="5dp"
                         android:text="脉冲2:"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="#111" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -264,9 +268,10 @@
 
                     <TextView
                         android:id="@+id/textView30"
-                        android:layout_width="200dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
+                        android:layout_weight="0.5"
                         android:background="@color/lighton"
                         android:padding="5dp"
                         android:text="GPS速度:"
@@ -275,14 +280,16 @@
 
                     <TextView
                         android:id="@+id/textView31"
-                        android:layout_width="200dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
+                        android:layout_weight="0.5"
                         android:background="@color/lighton"
                         android:padding="5dp"
                         android:text="GPS角度:"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="#111" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -291,7 +298,7 @@
 
                     <TextView
                         android:id="@+id/textView32"
-                        android:layout_width="410dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/lighton"
@@ -303,16 +310,19 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
+                android:layout_weight="0.8"
                 android:orientation="vertical" >
                 
                 <EditText
                     android:id="@+id/txtReception"
-                    android:layout_width="195dp"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:enabled="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
                     android:gravity="top"
                     android:hint="串口(无线)消息"
                     android:isScrollContainer="true"

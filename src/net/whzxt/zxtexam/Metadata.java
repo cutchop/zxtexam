@@ -34,7 +34,7 @@ public class Metadata extends Application {
 	private static final String DEF_DATARESOURCETYPE = "-1";// 0,串口;1,蓝牙
 
 	public static final int PERIOD = 100;// 100毫秒评判一次
-	private static final int DBVERSION = 70;
+	private static final int DBVERSION = 71;
 	private static final String DBNAME = "zxtexam.db";
 	private DBer sqlHelper;
 	private SQLiteDatabase db;
@@ -225,6 +225,14 @@ public class Metadata extends Application {
 			ret = DEF_MAICHONG_XS[n - 1];
 		}
 		return ret;
+	}
+	
+	public String getServiceInfo() {
+		return settings.getString("serviceinfo", getString(R.string.welcome5));
+	}
+	
+	public Boolean isLargeText() {
+		return settings.getBoolean("largetext", false);
 	}
 
 	public SerialPort getSerialPort() throws SecurityException, IOException, InvalidParameterException {

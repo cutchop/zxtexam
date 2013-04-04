@@ -46,7 +46,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	private LinearLayout layStart, laySystem, layRoute, layDetect;
-	private TextView txtVersionName;
+	private TextView txtVersionName, txtServiceInfo, textView1, textView2, textView3, textView4, textView5;
 	private String strResult;
 	private ProgressDialog _updateDialog;
 	private File _downLoadFile;
@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
 	private static final int H_W_UPDATEDIALOG_NOW = 0x02;
 	private static final int OPEN_GPS = 0x09;
 	private Metadata md;
-	private LocationManager locationManager;
+	private LocationManager locationManager;	
 
 	private Handler handler = new Handler() {
 		@Override
@@ -80,8 +80,24 @@ public class MainActivity extends Activity {
 		laySystem = (LinearLayout) findViewById(R.id.laySystem);
 		layRoute = (LinearLayout) findViewById(R.id.layRoute);
 		layDetect = (LinearLayout) findViewById(R.id.layDetect);
+		txtServiceInfo = (TextView) findViewById(R.id.txtServiceInfo);
 		txtVersionName = (TextView) findViewById(R.id.txtVersionName);
+		textView1 = (TextView) findViewById(R.id.textView1);
+		textView2 = (TextView) findViewById(R.id.textView2);
+		textView3 = (TextView) findViewById(R.id.textView3);
+		textView4 = (TextView) findViewById(R.id.textView4);
+		textView5 = (TextView) findViewById(R.id.textView5);
 		md = (Metadata) getApplication();
+		
+		if (md.isLargeText()) {
+			textView1.setTextSize(32);
+			textView2.setTextSize(28);
+			textView3.setTextSize(28);
+			textView4.setTextSize(28);
+			textView5.setTextSize(28);
+		}
+		
+		txtServiceInfo.setText(md.getServiceInfo());
 		layStart.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				startActivity(new Intent().setClass(MainActivity.this, ChooseActivity.class));

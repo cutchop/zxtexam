@@ -83,6 +83,29 @@ public class DetectActivity extends SerialPortActivity {
 		textView30 = (TextView) findViewById(R.id.textView30);
 		textView31 = (TextView) findViewById(R.id.textView31);
 		textView32 = (TextView) findViewById(R.id.textView32);
+		if (md.isLargeText()) {
+			textView0.setTextSize(32);
+			textView1.setTextSize(32);
+			textView2.setTextSize(32);
+			textView3.setTextSize(32);
+			textView4.setTextSize(32);
+			textView5.setTextSize(32);
+			textView6.setTextSize(32);
+			textView7.setTextSize(32);
+			textView8.setTextSize(32);
+			textView9.setTextSize(32);
+			textView10.setTextSize(32);
+			textView11.setTextSize(32);
+			textView12.setTextSize(32);
+			textView13.setTextSize(32);
+			textView14.setTextSize(32);
+			textView15.setTextSize(32);
+			textView20.setTextSize(32);
+			textView21.setTextSize(32);
+			textView30.setTextSize(32);
+			textView31.setTextSize(32);
+			textView32.setTextSize(32);
+		}
 		textView0.setText(md.getName(0));
 		textView1.setText(md.getName(1));
 		textView2.setText(md.getName(2));

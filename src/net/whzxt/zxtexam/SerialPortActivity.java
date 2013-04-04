@@ -42,6 +42,7 @@ public abstract class SerialPortActivity extends Activity {
 	private List<BluetoothDevice> listBlue;
 	protected Boolean isDeviceOK = false;
 	protected TextToSpeech mTts;
+	private Boolean needUnregisterReceiver = false;
 
 	private class ReadThread extends Thread {
 		@Override
@@ -64,7 +65,7 @@ public abstract class SerialPortActivity extends Activity {
 							}
 						}
 					} else {
-						for (int i = 0; i < size ; i++) {
+						for (int i = 0; i < size; i++) {
 							buffer[tsize] = tmp[i];
 							tsize++;
 							if (tsize >= 32) {
@@ -79,9 +80,9 @@ public abstract class SerialPortActivity extends Activity {
 								break;
 							}
 						}
-						if (buffer[tsize-1] == 0x1D) {
+						if (buffer[tsize - 1] == 0x1D) {
 							if (!isDeviceOK) {
-								isDeviceOK = true;	
+								isDeviceOK = true;
 							}
 							onDataReceived(buffer, tsize);
 							tsize = 0;
@@ -167,6 +168,7 @@ public abstract class SerialPortActivity extends Activity {
 				filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 				filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
 				this.registerReceiver(mReceiver, filter);
+				needUnregisterReceiver = true;
 				mAdapter.startDiscovery();
 			}
 		}
@@ -278,6 +280,9 @@ public abstract class SerialPortActivity extends Activity {
 	protected abstract void onDataReceived(final byte[] buffer, final int size);
 
 	protected void destroy() {
+		if (needUnregisterReceiver) {
+			this.unregisterReceiver(mReceiver);
+		}
 		if (mReadThread != null) {
 			mReadThread.interrupt();
 		}

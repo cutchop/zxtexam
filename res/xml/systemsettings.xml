@@ -42,6 +42,7 @@
 		<ListPreference android:entries="@array/baudrates_name" android:entryValues="@array/baudrates_value" android:key="baudrate" android:persistent="true" android:title="波特率"></ListPreference>
     </PreferenceCategory>
     <PreferenceCategory android:title="其他">
+        <EditTextPreference android:title="服务信息" android:key="serviceinfo" android:dialogTitle="服务信息"/>
         <Preference android:key="exportdata" android:title="导出数据"/>
     </PreferenceCategory>    
 </PreferenceScreen>

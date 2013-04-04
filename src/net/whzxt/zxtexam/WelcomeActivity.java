@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.app.Activity;
 import android.content.Intent;
 
@@ -14,6 +15,7 @@ public class WelcomeActivity extends Activity implements OnInitListener {
 
 	private TextToSpeech mTts;
 	private static final int REQ_TTS_STATUS_CHECK = 0;
+	private TextView txtServiceInfo;
 
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
@@ -57,6 +59,8 @@ public class WelcomeActivity extends Activity implements OnInitListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
+		txtServiceInfo = (TextView)findViewById(R.id.txtServiceInfo);
+		txtServiceInfo.setText(((Metadata) getApplicationContext()).getServiceInfo());
 		if (mTts == null) {
 			Intent checkIntent = new Intent();
 			checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);

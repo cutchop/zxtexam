@@ -85,6 +85,11 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 		preference = findPreference("dataresourcetype");
 		preference.setSummary(md.getDataResourceType() == 0 ? "串口" : "无线");
 		preference.setOnPreferenceChangeListener(this);
+		// 服务信息
+		preference = findPreference("serviceinfo");
+		preference.setSummary(md.getServiceInfo());		
+		preference.setDefaultValue(md.getServiceInfo());
+		preference.setOnPreferenceChangeListener(this);
 	}
 
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -130,6 +135,8 @@ public class SystemActivity extends PreferenceActivity implements OnPreferenceCl
 			preference.setSummary((String) newValue);
 		} else if (preference.getKey().equals("dataresourcetype")) {
 			preference.setSummary(newValue.toString().equals("0") ? "串口" : "无线");
+		} else if (preference.getKey().equals("serviceinfo")) {
+			preference.setSummary((String) newValue);
 		}
 		return true;
 	}

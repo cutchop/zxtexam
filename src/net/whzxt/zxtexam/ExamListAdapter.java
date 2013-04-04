@@ -12,6 +12,13 @@ import android.widget.TextView;
 
 public class ExamListAdapter extends ArrayAdapter<HashMap<String, String>> {
 
+	private Boolean isLargeText = false;
+
+	public ExamListAdapter(Context context, List<HashMap<String, String>> objects, Boolean b) {
+		super(context, 0, objects);
+		isLargeText = b;
+	}
+
 	public ExamListAdapter(Context context, List<HashMap<String, String>> objects) {
 		super(context, 0, objects);
 	}
@@ -24,7 +31,7 @@ public class ExamListAdapter extends ArrayAdapter<HashMap<String, String>> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
-		view = LayoutInflater.from(getContext()).inflate(R.layout.listlayout, null);
+		view = LayoutInflater.from(getContext()).inflate(isLargeText ? R.layout.listlayout_large : R.layout.listlayout, null);
 		TextView txtItem = (TextView) view.findViewById(R.id.textView1);
 		TextView txtKoufen = (TextView) view.findViewById(R.id.textView2);
 		TextView txtErr = (TextView) view.findViewById(R.id.textView3);

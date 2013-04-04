@@ -21,12 +21,14 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 public class ChooseActivity extends Activity implements OnInitListener {
 
 	private ListView listView;
+	private TextView textView1;
 	private Metadata md;
 	private List<String> data;
 	private Map<Integer, Integer> mapRouteID;
@@ -67,7 +69,11 @@ public class ChooseActivity extends Activity implements OnInitListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_choose);
 		listView = (ListView) findViewById(R.id.listView1);
+		textView1 = (TextView) findViewById(R.id.textView1);
 		md = (Metadata) getApplication();
+		if (md.isLargeText()) {
+			textView1.setTextSize(28);
+		}
 		data = new ArrayList<String>();
 		mapRouteID = new HashMap<Integer, Integer>();
 		int i = 0;
@@ -80,7 +86,7 @@ public class ChooseActivity extends Activity implements OnInitListener {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data));
+		listView.setAdapter(new ArrayAdapter<String>(this, md.isLargeText() ? R.layout.choose_list_large : android.R.layout.simple_expandable_list_item_1, data));
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 				if (data.get(arg2).indexOf("灯光") == -1) {
@@ -152,7 +158,7 @@ public class ChooseActivity extends Activity implements OnInitListener {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void onAttachedToWindow() {
 		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
