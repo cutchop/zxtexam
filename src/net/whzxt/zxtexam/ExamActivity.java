@@ -466,7 +466,7 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				}).create();
 				alertDialog.show();
 			}
-		});
+		});		
 		// 结束考试
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {

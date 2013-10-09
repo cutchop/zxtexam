@@ -1,7 +1,21 @@
 package net.whzxt.zxtexam;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.whzxt.zxtexam.R.string;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,8 +26,13 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ParseException;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -38,7 +57,7 @@ public class RouteEditActivity extends Activity {
 	private Metadata md;
 	private int routeid;
 	private List<String> data;
-	private List<Integer> itemids,xuhaos;
+	private List<Integer> itemids, xuhaos;
 	private LocationManager locationManager;
 	private static Integer[] itemids_0 = { 1, 2, 40, 6, 7, 39, 21, 9, 8, 41, 42, 43 };
 	private static Integer[] itemids_1 = { 38, 4, 36, 23, 37, 24, 5, 25, 26, 39 };
@@ -284,6 +303,90 @@ public class RouteEditActivity extends Activity {
 			// Provider的转态在可用、暂时不可用和无服务三个状态直接切换时触发此函数
 		}
 	};
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		int groupId = 0;
+		int menuItemOrder = Menu.NONE;
+		menu.add(groupId, 0, menuItemOrder, "上传该路线").setIcon(android.R.drawable.ic_menu_info_details);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case 0:
+			if (routeid == -1) {
+				Toast.makeText(RouteEditActivity.this, "请先保存路线名称", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(RouteEditActivity.this, "正在上传路线,请稍候...", Toast.LENGTH_LONG).show();
+				new AsyncTask<Void, Void, Integer>() {
+					@Override
+					protected Integer doInBackground(Void... args) {
+						Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE_ITEM + " where routeid=" + routeid + " order by xuhao");
+						String data = "";
+						if (cursor.moveToFirst()) {
+							do {
+								data += cursor.getInt(cursor.getColumnIndex("itemid")) + "," + cursor.getFloat(cursor.getColumnIndex("lon")) + "," + cursor.getFloat(cursor.getColumnIndex("lat")) + "," + cursor.getInt(cursor.getColumnIndex("angle")) + "," + cursor.getInt(cursor.getColumnIndex("xuhao")) + "|";
+							} while (cursor.moveToNext());
+						}
+						cursor.close();
+						HttpPost httpRequest = new HttpPost(getString(R.string.server) + "/examroute.ashx");
+						List<NameValuePair> params = new ArrayList<NameValuePair>(4);
+						params.add(new BasicNameValuePair("t", "p"));
+						params.add(new BasicNameValuePair("name", txtName.getText().toString()));
+						params.add(new BasicNameValuePair("data", data));
+						params.add(new BasicNameValuePair("imei", ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId()));
+						try {
+							httpRequest.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+						} catch (UnsupportedEncodingException e1) {
+							e1.printStackTrace();
+							return 0;
+						}
+						HttpResponse httpResponse = null;
+						try {
+							httpResponse = new DefaultHttpClient().execute(httpRequest);
+						} catch (ClientProtocolException e1) {
+							e1.printStackTrace();
+							return 0;
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							return 0;
+						}
+						if (httpResponse.getStatusLine().getStatusCode() == 200) {
+							try {
+								String result = EntityUtils.toString(httpResponse.getEntity());
+								if (result.equals("s")) {
+									return 1;
+								} else {
+									return 0;
+								}
+							} catch (ParseException e) {
+								e.printStackTrace();
+								return 0;
+							} catch (IOException e) {
+								e.printStackTrace();
+								return 0;
+							}
+						} else {
+							return 0;
+						}
+					}
+
+					@Override
+					protected void onPostExecute(Integer result) {
+						if (result == 0) {
+							Toast.makeText(RouteEditActivity.this, "路线上传失败,请重试", Toast.LENGTH_LONG).show();
+						} else {
+							Toast.makeText(RouteEditActivity.this, "路线上传成功!", Toast.LENGTH_LONG).show();
+						}
+					}
+				}.execute();
+			}
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
 	@Override
 	public void onAttachedToWindow() {

@@ -1,6 +1,8 @@
 package net.whzxt.zxtexam;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.annotation.SuppressLint;
@@ -306,7 +308,8 @@ public class DetectActivity extends SerialPortActivity {
 	}
 
 	private void appendText() {
-		txtReception.setText(data);
+		txtReception.setText(data + " [" + new java.text.SimpleDateFormat(  
+                "mm:ss").format(new Date()) + "]");
 	}
 
 	@Override
