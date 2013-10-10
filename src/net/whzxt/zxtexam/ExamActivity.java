@@ -65,7 +65,6 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Button btnRgpp, btnStop;
 	private static final int REQ_TTS_STATUS_CHECK = 0;
 	private LocationManager locationManager;
-	private byte[] mBuffer;
 	private int currId = 0;
 	private ActionManager actionManager;
 	private Boolean isAuto = false;
@@ -87,18 +86,23 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout").toString()) + Integer.parseInt(itemAllList.get(msg.what).get("range").toString()) == 0) {
+			if (Integer.parseInt(itemAllList.get(msg.what).get("timeout")
+					.toString())
+					+ Integer.parseInt(itemAllList.get(msg.what).get("range")
+							.toString()) == 0) {
 				speak(itemAllList.get(msg.what).get("tts").toString());
 				if (isAuto) {
 					startMatch = true;
 				}
 			} else {
 				currId = msg.what;
-				if (itemAllList.get(msg.what).get("type").toString().equals("0")) {
+				if (itemAllList.get(msg.what).get("type").toString()
+						.equals("0")) {
 					speak(itemAllList.get(msg.what).get("tts").toString());
 					execItem(msg.what);
 				} else {
-					speak(itemAllList.get(msg.what).get("tts").toString(), msg.what);
+					speak(itemAllList.get(msg.what).get("tts").toString(),
+							msg.what);
 				}
 			}
 		}
@@ -122,7 +126,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						} else if (Integer.parseInt(utteranceId) == -1) {
 							// 自动执行
 							if (isAuto) {
-								if (itemAllList.get(0).get("type").toString().equals("1")) {
+								if (itemAllList.get(0).get("type").toString()
+										.equals("1")) {
 									handler.sendEmptyMessage(0);
 								}
 								startMatch = true;
@@ -151,13 +156,16 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void refreshListView() {
-		listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList, md.isLargeText()));
+		listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList, md
+				.isLargeText()));
 		txtDefen.setText(String.valueOf(fenshu));
 	}
 
 	private void loadInit() {
 		if (Integer.parseInt(itemAllList.get(0).get("type").toString()) == 1) {
-			if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1 || md.getData(3) == 1 || md.getData(4) == 1 || md.getData(6) == 1 || md.getData(9) == 1) {
+			if (md.getData(0) == 1 || md.getData(1) == 1 || md.getData(2) == 1
+					|| md.getData(3) == 1 || md.getData(4) == 1
+					|| md.getData(6) == 1 || md.getData(9) == 1) {
 				needCheckLight = true;
 				speak("请关闭所有灯光,准备考试");
 				return;
@@ -173,7 +181,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 
 		// 控制屏幕长亮
 		PowerManager manager = ((PowerManager) getSystemService(POWER_SERVICE));
-		wakeLock = manager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "ATAAW");
+		wakeLock = manager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+				| PowerManager.ON_AFTER_RELEASE, "ATAAW");
 		wakeLock.acquire();
 
 		start = new Date();
@@ -227,7 +236,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					if (isAuto) {
 						startMatch = true;
 						if (currId < itemAllList.size() - 1) {
-							if (itemAllList.get(currId + 1).get("type").toString().equals("1")) {
+							if (itemAllList.get(currId + 1).get("type")
+									.toString().equals("1")) {
 								try {
 									Thread.sleep(2000);
 								} catch (InterruptedException e) {
@@ -237,20 +247,25 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 									handler.sendEmptyMessage(++currId);
 								}
 							} else {
-								speak(itemAllList.get(currId).get("endtts").toString());
+								speak(itemAllList.get(currId).get("endtts")
+										.toString());
 							}
 						} else if (currId == itemAllList.size() - 1) {
-							if (itemAllList.get(currId).get("type").toString().equals("1")) {
+							if (itemAllList.get(currId).get("type").toString()
+									.equals("1")) {
 								speak("考试合格,您的得分为," + fenshu + "分");
 							} else {
-								speak(itemAllList.get(currId).get("endtts").toString());
+								speak(itemAllList.get(currId).get("endtts")
+										.toString());
 							}
 						}
 					} else {
 						speak(itemAllList.get(currId).get("endtts").toString());
 					}
 				} else {
-					speak("考试不合格,您的扣分项目为," + errList.get(errList.size() - 1).get("errname") + ",请回中心打印成绩单");
+					speak("考试不合格,您的扣分项目为,"
+							+ errList.get(errList.size() - 1).get("errname")
+							+ ",请回中心打印成绩单");
 				}
 			}
 
@@ -259,9 +274,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				if (list.size() > 0) {
 					for (int i = 0; i < list.size(); i++) {
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put("itemname", (actionManager.getCurrIndex() + 1) + "." + actionManager.getAction(list.get(i)).Itemname);
-						map.put("fenshu", String.valueOf(actionManager.getAction(list.get(i)).Fenshu));
-						map.put("errname", actionManager.getAction(list.get(i)).Err);
+						map.put("itemname", (actionManager.getCurrIndex() + 1)
+								+ "."
+								+ actionManager.getAction(list.get(i)).Itemname);
+						map.put("fenshu", String.valueOf(actionManager
+								.getAction(list.get(i)).Fenshu));
+						map.put("errname",
+								actionManager.getAction(list.get(i)).Err);
 						errList.add(0, map);
 						fenshu -= actionManager.getAction(list.get(i)).Fenshu;
 					}
@@ -277,7 +296,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			}
 		});
 
-		Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE + " where routeid=" + routeid);
+		Cursor cursor = md.rawQuery("select * from " + DBer.T_ROUTE
+				+ " where routeid=" + routeid);
 		if (cursor.moveToFirst()) {
 			routeTts = cursor.getString(cursor.getColumnIndex("tts"));
 			isAuto = (cursor.getInt(cursor.getColumnIndex("auto")) == 1);
@@ -285,49 +305,70 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		}
 		cursor.close();
 		// ITEMS
-		cursor = md.rawQuery("select a.itemid,a.lon,a.lat,a.angle,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from " + DBer.T_ROUTE_ITEM + " a left join " + DBer.T_ITEM + " b on a.itemid=b.itemid where a.routeid=" + routeid + " order by a.xuhao");
+		cursor = md
+				.rawQuery("select a.itemid,a.lon,a.lat,a.angle,a.gpsrange,a.timeout,a.range,a.delay,a.delaymeter,b.name as itemname,b.tts,b.timeout as timeoutdef,b.type,b.endtts,b.range as rangedef,b.delay as delaydef,b.delaymeter as delaymeterdef from "
+						+ DBer.T_ROUTE_ITEM
+						+ " a left join "
+						+ DBer.T_ITEM
+						+ " b on a.itemid=b.itemid where a.routeid="
+						+ routeid
+						+ " order by a.xuhao");
 		int i, j;
 		i = j = 0;
 		if (cursor.moveToFirst()) {
 			HashMap<String, Object> map = null;
 			do {
 				map = new HashMap<String, Object>();
-				map.put("itemid", cursor.getInt(cursor.getColumnIndex("itemid")));
-				map.put("itemname", cursor.getString(cursor.getColumnIndex("itemname")));
+				map.put("itemid",
+						cursor.getInt(cursor.getColumnIndex("itemid")));
+				map.put("itemname",
+						cursor.getString(cursor.getColumnIndex("itemname")));
 				map.put("tts", cursor.getString(cursor.getColumnIndex("tts")));
-				map.put("endtts", cursor.getString(cursor.getColumnIndex("endtts")));
+				map.put("endtts",
+						cursor.getString(cursor.getColumnIndex("endtts")));
 				map.put("lon", cursor.getFloat(cursor.getColumnIndex("lon")));
 				map.put("lat", cursor.getFloat(cursor.getColumnIndex("lat")));
 				map.put("angle", cursor.getInt(cursor.getColumnIndex("angle")));
 				if (cursor.getInt(cursor.getColumnIndex("delay")) == 0) {
-					map.put("delay", cursor.getInt(cursor.getColumnIndex("delaydef")));
+					map.put("delay",
+							cursor.getInt(cursor.getColumnIndex("delaydef")));
 				} else {
-					map.put("delay", cursor.getInt(cursor.getColumnIndex("delay")));
+					map.put("delay",
+							cursor.getInt(cursor.getColumnIndex("delay")));
 				}
 				if (cursor.getInt(cursor.getColumnIndex("delaymeter")) == 0) {
-					map.put("delaymeter", cursor.getInt(cursor.getColumnIndex("delaymeterdef")));
+					map.put("delaymeter", cursor.getInt(cursor
+							.getColumnIndex("delaymeterdef")));
 				} else {
-					map.put("delaymeter", cursor.getInt(cursor.getColumnIndex("delaymeter")));
+					map.put("delaymeter",
+							cursor.getInt(cursor.getColumnIndex("delaymeter")));
 				}
 				if (cursor.getInt(cursor.getColumnIndex("gpsrange")) == 0) {
 					map.put("gpsrange", md.getRange());
 				} else {
-					map.put("gpsrange", cursor.getInt(cursor.getColumnIndex("gpsrange")));
-					Log.i("exam", String.valueOf(cursor.getInt(cursor.getColumnIndex("gpsrange"))));
+					map.put("gpsrange",
+							cursor.getInt(cursor.getColumnIndex("gpsrange")));
+					Log.i("exam", String.valueOf(cursor.getInt(cursor
+							.getColumnIndex("gpsrange"))));
 				}
 				if (cursor.getInt(cursor.getColumnIndex("timeout")) == 0) {
-					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeoutdef")));
+					map.put("timeout",
+							cursor.getInt(cursor.getColumnIndex("timeoutdef")));
 				} else {
-					map.put("timeout", cursor.getInt(cursor.getColumnIndex("timeout")));
+					map.put("timeout",
+							cursor.getInt(cursor.getColumnIndex("timeout")));
 				}
 				if (cursor.getInt(cursor.getColumnIndex("range")) == 0) {
-					map.put("range", cursor.getInt(cursor.getColumnIndex("rangedef")));
+					map.put("range",
+							cursor.getInt(cursor.getColumnIndex("rangedef")));
 				} else {
-					map.put("range", cursor.getInt(cursor.getColumnIndex("range")));
+					map.put("range",
+							cursor.getInt(cursor.getColumnIndex("range")));
 				}
 				map.put("type", cursor.getInt(cursor.getColumnIndex("type")));
 				map.put("over", "0");
-				if (cursor.getFloat(cursor.getColumnIndex("lon")) == 0 && cursor.getFloat(cursor.getColumnIndex("lat")) == 0) {
+				if (cursor.getFloat(cursor.getColumnIndex("lon")) == 0
+						&& cursor.getFloat(cursor.getColumnIndex("lat")) == 0) {
 					itemList.add(map);
 					itemNoMap.put(j, i);
 					j++;
@@ -337,9 +378,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+		gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, md
+				.isLargeText() ? R.layout.gridlayout_large
+				: R.layout.gridlayout, new String[] { "itemname" },
+				new int[] { R.id.textView1 }));
 		gridView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
 				if (cbHideAuto.isChecked()) {
 					arg2 = itemNoMap.get(arg2);
 				}
@@ -347,7 +392,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					if (actionManager.getCurrIndex() == arg2) {
 						actionManager.Stop();
 					} else {
-						Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中", Toast.LENGTH_SHORT).show();
+						Toast.makeText(ExamActivity.this, "请稍候,另一个考试项目正在评判中",
+								Toast.LENGTH_SHORT).show();
 					}
 				} else {
 					if (needCheckLight) {
@@ -365,48 +411,73 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 
 		// 扣分
 		listView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2, long arg3) {
-				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要取消这个扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						delListItem(arg2);
-					}
-				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						return;
-					}
-				}).create();
-				alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-						if (keyCode == KeyEvent.KEYCODE_HOME)
-							return true;
-						return false;
-					}
-				});
+			public void onItemClick(AdapterView<?> arg0, View arg1,
+					final int arg2, long arg3) {
+				AlertDialog alertDialog = new AlertDialog.Builder(
+						ExamActivity.this)
+						.setTitle("是否要取消这个扣分？")
+						.setIcon(android.R.drawable.ic_menu_help)
+						.setPositiveButton("是",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										delListItem(arg2);
+									}
+								})
+						.setNegativeButton("否",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										return;
+									}
+								}).create();
+				alertDialog
+						.setOnKeyListener(new DialogInterface.OnKeyListener() {
+							public boolean onKey(DialogInterface dialog,
+									int keyCode, KeyEvent event) {
+								if (keyCode == KeyEvent.KEYCODE_HOME)
+									return true;
+								return false;
+							}
+						});
 				alertDialog.show();
-				alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+				alertDialog.getWindow().setType(
+						WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 			}
 		});
 
 		layDefen.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("是否要清除扣分？").setIcon(android.R.drawable.ic_menu_help).setPositiveButton("是", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						delAllListItem();
-					}
-				}).setNegativeButton("否", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						return;
-					}
-				}).create();
-				alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-						if (keyCode == KeyEvent.KEYCODE_HOME)
-							return true;
-						return false;
-					}
-				});
+				AlertDialog alertDialog = new AlertDialog.Builder(
+						ExamActivity.this)
+						.setTitle("是否要清除扣分？")
+						.setIcon(android.R.drawable.ic_menu_help)
+						.setPositiveButton("是",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										delAllListItem();
+									}
+								})
+						.setNegativeButton("否",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										return;
+									}
+								}).create();
+				alertDialog
+						.setOnKeyListener(new DialogInterface.OnKeyListener() {
+							public boolean onKey(DialogInterface dialog,
+									int keyCode, KeyEvent event) {
+								if (keyCode == KeyEvent.KEYCODE_HOME)
+									return true;
+								return false;
+							}
+						});
 				alertDialog.show();
-				alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+				alertDialog.getWindow().setType(
+						WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 			}
 		});
 
@@ -417,56 +488,103 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				for (int i = 0; i < itemAllList.size(); i++) {
 					strs[i] = itemAllList.get(i).get("itemname").toString();
 				}
-				AlertDialog alertDialog = new AlertDialog.Builder(ExamActivity.this).setTitle("请选择项目").setIcon(android.R.drawable.ic_menu_add).setItems(strs, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						final String tmpitemname = itemAllList.get(which).get("itemname").toString();
-						Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM_ERR + " where itemid=" + itemAllList.get(which).get("itemid"));
-						if (cursor.moveToFirst()) {
-							final String[] strs2 = new String[cursor.getCount()];
-							final String[] fenshus = new String[cursor.getCount()];
-							final String[] errnames = new String[cursor.getCount()];
-							int k = 0;
-							do {
-								strs2[k] = "[" + cursor.getString(cursor.getColumnIndex("fenshu")) + "分]" + " " + cursor.getString(cursor.getColumnIndex("name"));
-								errnames[k] = cursor.getString(cursor.getColumnIndex("name"));
-								fenshus[k] = cursor.getString(cursor.getColumnIndex("fenshu"));
-								k++;
-							} while (cursor.moveToNext());
-							AlertDialog dialog2 = new AlertDialog.Builder(ExamActivity.this).setTitle("请选择扣分项").setIcon(android.R.drawable.ic_menu_add).setItems(strs2, new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									HashMap<String, String> map = new HashMap<String, String>();
-									map.put("itemname", tmpitemname);
-									map.put("fenshu", fenshus[which]);
-									map.put("errname", errnames[which]);
-									errList.add(0, map);
-									fenshu -= Integer.parseInt(fenshus[which]);
-									if (fenshu < 0) {
-										fenshu = 0;
-									}
-									if (fenshu < 90) {
-										speak("考试不合格,扣分项目为," + strs2[which]);
-									}
-									listView.setAdapter(new ExamListAdapter(ExamActivity.this, errList, md.isLargeText()));
-									txtDefen.setText(String.valueOf(fenshu));
+				AlertDialog alertDialog = new AlertDialog.Builder(
+						ExamActivity.this)
+						.setTitle("请选择项目")
+						.setIcon(android.R.drawable.ic_menu_add)
+						.setItems(strs, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								final String tmpitemname = itemAllList
+										.get(which).get("itemname").toString();
+								Cursor cursor = md.rawQuery("select * from "
+										+ DBer.T_ITEM_ERR + " where itemid="
+										+ itemAllList.get(which).get("itemid"));
+								if (cursor.moveToFirst()) {
+									final String[] strs2 = new String[cursor
+											.getCount()];
+									final String[] fenshus = new String[cursor
+											.getCount()];
+									final String[] errnames = new String[cursor
+											.getCount()];
+									int k = 0;
+									do {
+										strs2[k] = "["
+												+ cursor.getString(cursor
+														.getColumnIndex("fenshu"))
+												+ "分]"
+												+ " "
+												+ cursor.getString(cursor
+														.getColumnIndex("name"));
+										errnames[k] = cursor.getString(cursor
+												.getColumnIndex("name"));
+										fenshus[k] = cursor.getString(cursor
+												.getColumnIndex("fenshu"));
+										k++;
+									} while (cursor.moveToNext());
+									AlertDialog dialog2 = new AlertDialog.Builder(
+											ExamActivity.this)
+											.setTitle("请选择扣分项")
+											.setIcon(
+													android.R.drawable.ic_menu_add)
+											.setItems(
+													strs2,
+													new DialogInterface.OnClickListener() {
+														public void onClick(
+																DialogInterface dialog,
+																int which) {
+															HashMap<String, String> map = new HashMap<String, String>();
+															map.put("itemname",
+																	tmpitemname);
+															map.put("fenshu",
+																	fenshus[which]);
+															map.put("errname",
+																	errnames[which]);
+															errList.add(0, map);
+															fenshu -= Integer
+																	.parseInt(fenshus[which]);
+															if (fenshu < 0) {
+																fenshu = 0;
+															}
+															if (fenshu < 90) {
+																speak("考试不合格,扣分项目为,"
+																		+ strs2[which]);
+															}
+															listView.setAdapter(new ExamListAdapter(
+																	ExamActivity.this,
+																	errList,
+																	md.isLargeText()));
+															txtDefen.setText(String
+																	.valueOf(fenshu));
+														}
+													})
+											.setNegativeButton(
+													"取消",
+													new DialogInterface.OnClickListener() {
+														public void onClick(
+																DialogInterface dialog,
+																int which) {
+															return;
+														}
+													}).create();
+									dialog2.show();
+								} else {
+									Toast.makeText(ExamActivity.this,
+											"该项目没有扣分项", Toast.LENGTH_SHORT)
+											.show();
 								}
-							}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									return;
-								}
-							}).create();
-							dialog2.show();
-						} else {
-							Toast.makeText(ExamActivity.this, "该项目没有扣分项", Toast.LENGTH_SHORT).show();
-						}
-					}
-				}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						return;
-					}
-				}).create();
+							}
+						})
+						.setNegativeButton("取消",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										return;
+									}
+								}).create();
 				alertDialog.show();
 			}
-		});		
+		});
 		// 结束考试
 		btnStop.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -475,38 +593,34 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		});
 		// 隐藏自动触发的项目
 		cbHideAuto.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
 				if (isChecked) {
-					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+					gridView.setAdapter(new SimpleAdapter(ExamActivity.this,
+							itemList,
+							md.isLargeText() ? R.layout.gridlayout_large
+									: R.layout.gridlayout,
+							new String[] { "itemname" },
+							new int[] { R.id.textView1 }));
 				} else {
-					gridView.setAdapter(new SimpleAdapter(ExamActivity.this, itemAllList, md.isLargeText() ? R.layout.gridlayout_large : R.layout.gridlayout, new String[] { "itemname" }, new int[] { R.id.textView1 }));
+					gridView.setAdapter(new SimpleAdapter(ExamActivity.this,
+							itemAllList,
+							md.isLargeText() ? R.layout.gridlayout_large
+									: R.layout.gridlayout,
+							new String[] { "itemname" },
+							new int[] { R.id.textView1 }));
 				}
 			}
 		});
-
-		mBuffer = new byte[7];
-		mBuffer[0] = 0x1A;
-		mBuffer[1] = 0x01;
-		mBuffer[2] = 0x00;
-		mBuffer[3] = 0x00;
-		mBuffer[4] = 0x00;
-		mBuffer[5] = 0x00;
-		mBuffer[6] = 0x1D;
 
 		if (_timerSerial == null) {
 			_timerSerial = new Timer();
 			_timerSerial.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					try {
-						if (mOutputStream != null) {
-							mOutputStream.write(mBuffer);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					writeSerial();
 				}
-			}, 1000, 100);
+			}, 100, 100);
 		}
 
 		// 计时
@@ -518,9 +632,15 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					mile += (md.getData(21) * 1000 / 3600);
 					runOnUiThread(new Runnable() {
 						public void run() {
-							txtTime.setText("用时：" + getTimeDiff(start, new Date()));
+							txtTime.setText("用时："
+									+ getTimeDiff(start, new Date()));
 							txtMile.setText("里程：" + getMileString());
-							txtStatus.setText("经纬度:" + md.getLatLonString() + "\n角度:" + md.getData(31) + " " + md.getName(20) + ":" + md.getData(20) + " " + md.getName(21) + ":" + md.getData(21) + "\n信号:" + md.get16DataString());
+							txtStatus.setText("经纬度:" + md.getLatLonString()
+									+ "\n角度:" + md.getData(31) + " "
+									+ md.getName(20) + ":" + md.getData(20)
+									+ " " + md.getName(21) + ":"
+									+ md.getData(21) + "\n信号:"
+									+ md.get16DataString());
 						}
 					});
 					// 检查设备是否就绪
@@ -546,7 +666,10 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 					}
 					// 灯光考试时检查是否已经关闭所有灯光，然后开始考试
 					if (needCheckLight) {
-						if (md.getData(0) == 0 && md.getData(1) == 0 && md.getData(2) == 0 && md.getData(3) == 0 && md.getData(4) == 0 && md.getData(6) == 0 && md.getData(9) == 0) {
+						if (md.getData(0) == 0 && md.getData(1) == 0
+								&& md.getData(2) == 0 && md.getData(3) == 0
+								&& md.getData(4) == 0 && md.getData(6) == 0
+								&& md.getData(9) == 0) {
 							needCheckLight = false;
 							speak(routeTts, -1);
 						}
@@ -564,7 +687,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		// GPS
 		if (locationManager == null) {
 			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
+			locationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 		}
 
 		// 检测考试过程中熄火
@@ -600,7 +724,12 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	}
 
 	private void execItem(int index) {
-		Cursor cursor = md.rawQuery("select a.*,b.name as errname,b.fenshu from " + DBer.T_ITEM_ACTION + " a left join " + DBer.T_ITEM_ERR + " b on a.errid=b.errid where a.itemid=" + itemAllList.get(index).get("itemid"));
+		Cursor cursor = md
+				.rawQuery("select a.*,b.name as errname,b.fenshu from "
+						+ DBer.T_ITEM_ACTION + " a left join "
+						+ DBer.T_ITEM_ERR
+						+ " b on a.errid=b.errid where a.itemid="
+						+ itemAllList.get(index).get("itemid"));
 		if (cursor.moveToFirst()) {
 			List<BaseAction> list = new ArrayList<BaseAction>();
 			do {
@@ -608,11 +737,15 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				int times = cursor.getInt(cursor.getColumnIndex("times"));
 				int min = cursor.getInt(cursor.getColumnIndex("min"));
 				int max = cursor.getInt(cursor.getColumnIndex("max"));
-				BaseAction action = actionManager.GetActionObject(md, dataid, times, max, min);
-				action.Itemname = itemAllList.get(index).get("itemname").toString();
+				BaseAction action = actionManager.GetActionObject(md, dataid,
+						times, max, min);
+				action.Itemname = itemAllList.get(index).get("itemname")
+						.toString();
 				if (cursor.getInt(cursor.getColumnIndex("errid")) != 999) {
-					action.Err = cursor.getString(cursor.getColumnIndex("errname"));
-					action.Fenshu = cursor.getInt(cursor.getColumnIndex("fenshu"));
+					action.Err = cursor.getString(cursor
+							.getColumnIndex("errname"));
+					action.Fenshu = cursor.getInt(cursor
+							.getColumnIndex("fenshu"));
 				} else {
 					action.Err = "";
 					action.Fenshu = 0;
@@ -627,10 +760,15 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 			}
 			txtCurrentName.setText(String.valueOf(index + 1) + "." + nString);
 			actionManager.setMetadata(md);
-			actionManager.setDelay(Integer.parseInt(itemAllList.get(index).get("delay").toString()));
-			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index).get("delaymeter").toString()));
-			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index).get("timeout").toString()));
-			actionManager.setRange(Integer.parseInt(itemAllList.get(index).get("range").toString()) - gpsrangeCorr);
+			actionManager.setDelay(Integer.parseInt(itemAllList.get(index)
+					.get("delay").toString()));
+			actionManager.setDelaymeter(Integer.parseInt(itemAllList.get(index)
+					.get("delaymeter").toString()));
+			actionManager.setTimeout(Integer.parseInt(itemAllList.get(index)
+					.get("timeout").toString()));
+			actionManager.setRange(Integer.parseInt(itemAllList.get(index)
+					.get("range").toString())
+					- gpsrangeCorr);
 			actionManager.TotalPoints = fenshu;
 			actionManager.setActions(list);
 			actionManager.setCurrIndex(index);
@@ -640,11 +778,13 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 
 	private void delListItem(int index) {
 		errList.remove(index);
-		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList, md.isLargeText());
+		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this,
+				errList, md.isLargeText());
 		listView.setAdapter(adapter);
 		fenshu = 100;
 		for (int i = 0; i < errList.size(); i++) {
-			fenshu = fenshu - Integer.parseInt(errList.get(i).get("fenshu").toString());
+			fenshu = fenshu
+					- Integer.parseInt(errList.get(i).get("fenshu").toString());
 		}
 		if (fenshu < 0) {
 			fenshu = 0;
@@ -658,7 +798,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 	private void delAllListItem() {
 		fenshu = 100;
 		errList.clear();
-		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this, errList, md.isLargeText());
+		ExamListAdapter adapter = new ExamListAdapter(ExamActivity.this,
+				errList, md.isLargeText());
 		listView.setAdapter(adapter);
 		txtDefen.setText(String.valueOf(fenshu));
 		if (isAuto) {
@@ -670,21 +811,35 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		public void onLocationChanged(Location location) {
 			if (location != null) {
 				md.setGPSSpeed(location.getSpeed());
-				md.setGPSLatlon((float) location.getLatitude(), (float) location.getLongitude());
+				md.setGPSLatlon((float) location.getLatitude(),
+						(float) location.getLongitude());
 				md.setData(31, Math.round(location.getBearing()));
-				if (startMatch && !actionManager.IsRunning && location.getLatitude() != 0) {
+				if (startMatch && !actionManager.IsRunning
+						&& location.getLatitude() != 0) {
 					for (int i = 0; i < itemAllList.size(); i++) {
-						if (Float.parseFloat(itemAllList.get(i).get("lat").toString()) != 0f) {
+						if (Float.parseFloat(itemAllList.get(i).get("lat")
+								.toString()) != 0f) {
 							Location loa = new Location("reverseGeocoded");
-							loa.setLatitude(Double.parseDouble(itemAllList.get(i).get("lat").toString()));
-							loa.setLongitude(Double.parseDouble(itemAllList.get(i).get("lon").toString()));
+							loa.setLatitude(Double.parseDouble(itemAllList
+									.get(i).get("lat").toString()));
+							loa.setLongitude(Double.parseDouble(itemAllList
+									.get(i).get("lon").toString()));
 							float dis = location.distanceTo(loa);
-							if (dis <= Integer.parseInt(itemAllList.get(i).get("gpsrange").toString())) {
-								if (itemAllList.get(i).get("over").toString().equals("0")) {
-									if (isAngleInRange(Integer.parseInt(itemAllList.get(i).get("angle").toString()), md.getData(31), 30)) {
+							if (dis <= Integer.parseInt(itemAllList.get(i)
+									.get("gpsrange").toString())) {
+								if (itemAllList.get(i).get("over").toString()
+										.equals("0")) {
+									if (isAngleInRange(
+											Integer.parseInt(itemAllList.get(i)
+													.get("angle").toString()),
+											md.getData(31), 30)) {
 										startMatch = false;
 										itemAllList.get(i).put("over", "1");
-										gpsrangeCorr = Integer.parseInt(itemAllList.get(i).get("gpsrange").toString()) - Math.round(dis);
+										gpsrangeCorr = Integer
+												.parseInt(itemAllList.get(i)
+														.get("gpsrange")
+														.toString())
+												- Math.round(dis);
 										handler.sendEmptyMessage(i);
 										break;
 									}
@@ -771,18 +926,24 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		if (mTts != null) {
 			if (index == -1) {
 				HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "-1");
+				myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,
+						"-1");
 				mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 			} else {
-				Cursor cursor = md.rawQuery("select * from " + DBer.T_ITEM_ACTION + " where itemid=" + itemAllList.get(index).get("itemid"));
+				Cursor cursor = md.rawQuery("select * from "
+						+ DBer.T_ITEM_ACTION + " where itemid="
+						+ itemAllList.get(index).get("itemid"));
 				if (cursor.getCount() > 0) {
 					HashMap<String, String> myHashAlarm = new HashMap<String, String>();
-					myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(index));
+					myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID,
+							String.valueOf(index));
 					mTts.speak(str, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
 				} else {
 					handler.post(new Runnable() {
 						public void run() {
-							Toast.makeText(ExamActivity.this, "该项目还没有设置评判条件,请在[系统设置]-[项目设置]里设置", Toast.LENGTH_SHORT).show();
+							Toast.makeText(ExamActivity.this,
+									"该项目还没有设置评判条件,请在[系统设置]-[项目设置]里设置",
+									Toast.LENGTH_SHORT).show();
 						}
 					});
 				}
@@ -809,23 +970,28 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 				}
 			}
 			data = data.toUpperCase();
-			data = data.replace("1B11", "1A").replace("1B14", "1D").replace("1B0B", "1B");
+			data = data.replace("1B11", "1A").replace("1B14", "1D")
+					.replace("1B0B", "1B");
 			int t1 = 0;
 			int t2 = 0;
 			for (int i = 2; i < 20; i++) {
 				t1 += Integer.parseInt(data.substring(i, i + 2), 16);
 				i++;
 			}
-			t2 = Integer.parseInt(data.substring(26, 28) + data.substring(24, 26), 16);
+			t2 = Integer.parseInt(
+					data.substring(26, 28) + data.substring(24, 26), 16);
 			if (t1 != t2) {
 				return;
 			}
 			// debug
-			if (Integer.parseInt(data.substring(28, 30) + data.substring(30, 32), 16) > 0) {
-				md.setData(31, Integer.parseInt(data.substring(28, 30) + data.substring(30, 32), 16));
+			if (Integer.parseInt(
+					data.substring(28, 30) + data.substring(30, 32), 16) > 0) {
+				md.setData(31, Integer.parseInt(
+						data.substring(28, 30) + data.substring(30, 32), 16));
 			}
 			if (data.substring(2, 4).equals("02")) {
-				String str = md.toBinaryString(Integer.parseInt(data.substring(4, 6), 16));
+				String str = md.toBinaryString(Integer.parseInt(
+						data.substring(4, 6), 16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
 						md.setData(7 - i, 1);
@@ -833,7 +999,8 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						md.setData(7 - i, 0);
 					}
 				}
-				str = md.toBinaryString(Integer.parseInt(data.substring(6, 8), 16));
+				str = md.toBinaryString(Integer.parseInt(data.substring(6, 8),
+						16));
 				for (int i = 0; i < str.length(); i++) {
 					if (str.substring(i, i + 1).equals("1")) {
 						md.setData(15 - i, 1);
@@ -841,8 +1008,10 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 						md.setData(15 - i, 0);
 					}
 				}
-				md.setData(20, Integer.parseInt(data.substring(10, 12) + data.substring(8, 10), 16));
-				md.setData(21, Integer.parseInt(data.substring(18, 20) + data.substring(16, 18), 16));
+				md.setData(20, Integer.parseInt(
+						data.substring(10, 12) + data.substring(8, 10), 16));
+				md.setData(21, Integer.parseInt(
+						data.substring(18, 20) + data.substring(16, 18), 16));
 			}
 		}
 	}
@@ -852,13 +1021,19 @@ public class ExamActivity extends SerialPortActivity implements OnInitListener {
 		AlertDialog dialog = null;
 		switch (id) {
 		case DL_SEARCHING:
-			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在搜索无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			dialog = new AlertDialog.Builder(ExamActivity.this)
+					.setCancelable(false).setMessage("正在搜索无线设备...")
+					.setIcon(android.R.drawable.ic_dialog_info).create();
 			break;
 		case DL_CONNECTING:
-			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在连接无线设备...").setIcon(android.R.drawable.ic_dialog_info).create();
+			dialog = new AlertDialog.Builder(ExamActivity.this)
+					.setCancelable(false).setMessage("正在连接无线设备...")
+					.setIcon(android.R.drawable.ic_dialog_info).create();
 			break;
 		case DL_CHECKDEVICESTATUS:
-			dialog = new AlertDialog.Builder(ExamActivity.this).setCancelable(false).setMessage("正在检测设备,请稍候...").setIcon(android.R.drawable.ic_dialog_info).create();
+			dialog = new AlertDialog.Builder(ExamActivity.this)
+					.setCancelable(false).setMessage("正在检测设备,请稍候...")
+					.setIcon(android.R.drawable.ic_dialog_info).create();
 			break;
 		default:
 			return null;

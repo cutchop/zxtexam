@@ -1,7 +1,5 @@
 package net.whzxt.zxtexam;
 
-import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,10 +26,8 @@ public class DetectActivity extends SerialPortActivity {
 	private TextView textView30, textView31, textView32;
 	private EditText txtReception;
 	private Timer _timer;
-	private Boolean readFlag = false;
 	private LocationManager locationManager;
 	private String data;
-	private byte[] mBuffer;
 	private WakeLock wakeLock;
 
 	private Handler handler = new Handler() {
@@ -147,24 +143,12 @@ public class DetectActivity extends SerialPortActivity {
 		textView30.setBackgroundResource(R.color.lightoff);
 		textView31.setBackgroundResource(R.color.lightoff);
 		textView32.setBackgroundResource(R.color.lightoff);
-		mBuffer = new byte[7];
-		mBuffer[0] = 0x1A;
-		mBuffer[1] = 0x01;
-		mBuffer[2] = 0x00;
-		mBuffer[3] = 0x00;
-		mBuffer[4] = 0x00;
-		mBuffer[5] = 0x00;
-		mBuffer[6] = 0x1D;
 		if (_timer == null) {
 			_timer = new Timer();
 			_timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					if (!readFlag) {
-						readFlag = !readFlag;
 						writeSerial();
-						readFlag = !readFlag;
-					}
 				}
 			}, 100, 100);
 		}
@@ -172,16 +156,6 @@ public class DetectActivity extends SerialPortActivity {
 			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 0, locationListener);
 			changeGPS();
-		}
-	}
-
-	private void writeSerial() {
-		try {
-			if (mOutputStream != null) {
-				mOutputStream.write(mBuffer);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

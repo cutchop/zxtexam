@@ -179,14 +179,15 @@ public class MainActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {
 					md.setDataResourceType(0);
 				}
-			}).setNegativeButton("无线", new DialogInterface.OnClickListener() {
+			}).setNegativeButton("WIFI", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
+					/*
 					BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
 					if (mAdapter == null) {
 						md.setDataResourceType(0);
 						Toast.makeText(MainActivity.this, "此设备不支持无线", Toast.LENGTH_SHORT).show();
 						return;
-					}
+					}*/
 					md.setDataResourceType(1);
 				}
 			}).create();

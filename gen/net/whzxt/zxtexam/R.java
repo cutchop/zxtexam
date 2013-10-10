@@ -133,8 +133,8 @@ public final class R {
         public static final int app_name=0x7f080000;
         public static final int error_configuration=0x7f080003;
         public static final int error_security=0x7f080004;
-        public static final int error_unfind=0x7f080006;
         public static final int error_unknown=0x7f080005;
+        public static final int error_wifi=0x7f080006;
         public static final int server=0x7f080002;
         public static final int version=0x7f080001;
         public static final int welcome1=0x7f080007;

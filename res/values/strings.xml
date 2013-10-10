@@ -1,12 +1,12 @@
 <resources>
 
     <string name="app_name">练车宝</string>
-    <string name="version">3.9</string>
+    <string name="version">4.1</string>
     <string name="server">http://221.232.160.197</string>
     <string name="error_configuration">请先设置串口.</string>
     <string name="error_security">您没有权限读写这个串口.</string>
     <string name="error_unknown">串口打开失败.</string>
-    <string name="error_unfind">没有搜索到无线设备.</string>
+    <string name="error_wifi">与设备连接失败,请检查您的WIFI设置.</string>
 	<string name="welcome1">欢迎使用</string>
 	<string name="welcome2">“练车宝” 之</string>
 	<string name="welcome3">驾驶人科目三路考智能训练系统</string>
